@@ -7,10 +7,10 @@
 
 double train[][2] = {
     {0, 0},
-    {1, 2},
-    {2, 4},
-    {3, 6},
-    {4, 8},
+    {1, 3},
+    {2, 6},
+    {3, 9},
+    {4, 12},
 };
 
 #define train_count (sizeof(train)/sizeof(train[0]))
