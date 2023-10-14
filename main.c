@@ -12,6 +12,16 @@ double or_train[][3] = {
     {1, 1, 1},
 };
 
+// AND-gate
+
+double and_train[][3] = {
+    {0, 0, 0},
+    {1, 0, 0},
+    {0, 1, 0},
+    {1, 1, 1},
+
+};
+
 // the simple training set:
 
 double train[][2] = {
@@ -24,6 +34,7 @@ double train[][2] = {
 
 #define train_count (sizeof(train)/sizeof(train[0]))
 #define or_train_count (sizeof(or_train) / sizeof(or_train[0]))
+#define and_train_count (sizeof(and_train)/sizeof(and_train[0]))
 
 // returns random double from 0 to 10 (not quite there yet, we'll try again)
 
