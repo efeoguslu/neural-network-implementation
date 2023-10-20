@@ -10,6 +10,7 @@
 void randomize(void);
 void dline(void);
 void menu(void);
+void test_model(double, double);
 
 #endif
 

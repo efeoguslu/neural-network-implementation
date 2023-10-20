@@ -1,11 +1,12 @@
 #include "helpers.h"
+#include "activation.h"
 
 void randomize(void){
     srand((unsigned int)time(0));
 }
 
 void dline(void){
-    printf("-------------------------------------------\n");
+    printf("---------------------------------------------\n");
 }
 
 void menu(void){ // inputs should not be void 
@@ -27,4 +28,15 @@ void menu(void){ // inputs should not be void
 
     printf("\n");
 
+}
+
+// Maybe Move Elsewhere...
+
+void test_model(double w1, double w2){
+    printf("\nTest:\n");
+    for(size_t i = 0; i < 2; ++i){
+        for(size_t j = 0; j < 2; ++j){
+            printf("%zu | %zu = %f\n", i, j, sigmoid(i*w1 + j*w2));
+        }
+    }
 }
