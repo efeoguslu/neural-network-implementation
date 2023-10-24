@@ -32,11 +32,11 @@ void menu(void){ // inputs should not be void
 
 // Maybe Move Elsewhere...
 
-void test_model(double w1, double w2){
+void test_model(double w1, double w2, double b){
     printf("\nTest:\n");
     for(size_t i = 0; i < 2; ++i){
         for(size_t j = 0; j < 2; ++j){
-            printf("%zu | %zu = %f\n", i, j, sigmoid(i*w1 + j*w2));
+            printf("%zu | %zu = %f\n", i, j, sigmoid(i*w1 + j*w2 + b));
         }
     }
 }

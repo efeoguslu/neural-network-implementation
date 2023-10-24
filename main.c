@@ -57,6 +57,7 @@ double rand_double(double min, double max)
 // ********************************************************************************
 
 
+
 // ---- COST FUNCTIONS ----
 
 // cost function: we want it to go to 0.
@@ -92,7 +93,7 @@ double cost_two_inputs(double w1, double w2, double bias){
     for(size_t i = 0; i < or_train_count; ++i){
         double x1 = or_train[i][0];
         double x2 = or_train[i][1];
-        double y = sigmoid(x1*w1 + x2*w2); // single artificial neuron mathematical model (with two inputs)
+        double y = sigmoid(x1*w1 + x2*w2 + bias); // single artificial neuron mathematical model (with two inputs and a bias)
         double d = y - or_train[i][2];
         result += d*d;
 
@@ -108,17 +109,16 @@ double cost_two_inputs(double w1, double w2, double bias){
 
 int main(){
 
-    menu();
+    // menu();
     randomize();
     
     // mathematical model:
     // y = x * w + bias ; --> output = input * weight + bias 
     
-    
-    double w1 = rand_double(0.0, 10.0); // random number from 0 to 1
-    double w2 = rand_double(0.0, 10.0);
 
-    double b = rand_double(0.0, 5.0);  // random number from 0 to 5
+    double w1 = rand_double(0.0, 10.0); // random number from 0 to 10
+    double w2 = rand_double(0.0, 10.0);
+    double b  = rand_double(0.0, 5.0);  // random number from 0 to 5
 
     double eps = 1e-3;
     double rate = 1e-3;
@@ -127,15 +127,15 @@ int main(){
     for(size_t i = 0; i < 1000; ++i){
         
         double c = cost_two_inputs(w1, w2, b);
+
         // finite difference: approximation of derivative 
         double dw1 = ((cost_two_inputs(w1 + eps, w2, b) - c)/eps);
         double dw2 = ((cost_two_inputs(w1, w2 + eps, b) - c)/eps);
         double db  = ((cost_two_inputs(w1, w2, b + eps) - c)/eps);
 
-        
         w1 -= rate*dw1;
         w2 -= rate*dw2;
-        b -= rate*db;
+        b  -= rate*db;
 
         printf("cost = %f, w1 = %f, w2 = %f, bias = %f\n", cost_two_inputs(w1, w2, b), w1, w2, b);
 
@@ -144,6 +144,5 @@ int main(){
     dline();
     printf("cost = %f, w1 = %f, w2 = %f, bias = %f\n", cost_two_inputs(w1, w2, b), w1, w2, b);
 
-    test_model(w1, w2);
-
+    test_model(w1, w2, b);
 }
