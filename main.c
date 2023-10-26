@@ -1,7 +1,7 @@
 #include "activation.h"
 #include "helpers.h"
 
-// 1 - 1.22.36
+// 1 - 1.28.00
 
 // ********************************************************************************
 
@@ -48,11 +48,19 @@ double train[][2] = {
 
 // ********************************************************************************
 
+/*
 double rand_double(double min, double max)
 {
     double scale = rand() / (double)RAND_MAX; // [0, 1.0] 
     return min + scale * (max - min);         // [min, max] 
 }
+*/
+
+double rand_double(void)
+{
+    return (double)rand() / (double)RAND_MAX;
+}
+
 
 // ********************************************************************************
 
@@ -109,22 +117,24 @@ double cost_two_inputs(double w1, double w2, double bias){
 
 int main(){
 
-    // menu();
+    // menu();  
     randomize();
     
     // mathematical model:
     // y = x * w + bias ; --> output = input * weight + bias 
     
 
-    double w1 = rand_double(0.0, 10.0); // random number from 0 to 10
-    double w2 = rand_double(0.0, 10.0);
-    double b  = rand_double(0.0, 5.0);  // random number from 0 to 5
+    double w1 = rand_double()*10 - 5; // random number from 0 to 10
+    double w2 = rand_double()*10 - 5;
+    double b  = rand_double()*10 - 5;  // random number from 0 to 5
 
     double eps = 1e-3;
     double rate = 1e-3;
 
+    size_t epoch = 1000;
 
-    for(size_t i = 0; i < 1000; ++i){
+
+    for(size_t i = 0; i < epoch; ++i){
         
         double c = cost_two_inputs(w1, w2, b);
 

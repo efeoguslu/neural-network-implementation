@@ -23,8 +23,14 @@ int d_binary_step(double x){
 
 // -----------------------------------------------
 
+/*
 double sigmoid(double n){
     return (1 / (1 + pow(EULER_NUMBER, -n)));
+}
+*/
+
+double sigmoid(double n){
+    return (1.0 / (1.0 + exp(-n)));
 }
 
 double d_sigmoid(double n){
