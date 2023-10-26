@@ -133,7 +133,6 @@ int main(){
 
     size_t epoch = 1000;
 
-
     for(size_t i = 0; i < epoch; ++i){
         
         double c = cost_two_inputs(w1, w2, b);
