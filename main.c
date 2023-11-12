@@ -1,8 +1,6 @@
 #include "activation.h"
 #include "helpers.h"
 
-// 1 - 1.28.00
-
 // ********************************************************************************
 
 // ---- TRAINING SETS ---- 
@@ -26,6 +24,16 @@ double and_train[][3] = {
 
 };
 
+// NAND-gate
+
+double nand_train[][3] = {
+    {0, 0, 1},
+    {1, 0, 1},
+    {0, 1, 1},
+    {1, 1, 0},
+
+};
+
 // the simple training set:
 
 double train[][2] = {
@@ -40,23 +48,15 @@ double train[][2] = {
 
 // ---- TRAINING SET COUNTS ----
 
+//#define train_count (sizeof(train)/sizeof(train[0]))
 
-#define train_count (sizeof(train)/sizeof(train[0]))
 #define or_train_count (sizeof(or_train) / sizeof(or_train[0]))
 #define and_train_count (sizeof(and_train)/sizeof(and_train[0]))
-
+#define train_count(x) (sizeof(x)/sizeof(x[0]))
 
 // ********************************************************************************
 
-/*
-double rand_double(double min, double max)
-{
-    double scale = rand() / (double)RAND_MAX; // [0, 1.0] 
-    return min + scale * (max - min);         // [min, max] 
-}
-*/
-
-double rand_double(void)
+double rand_double(void) 
 {
     return (double)rand() / (double)RAND_MAX;
 }
@@ -64,16 +64,7 @@ double rand_double(void)
 
 // ********************************************************************************
 
-
-
-// ---- COST FUNCTIONS ----
-
-// cost function: we want it to go to 0.
-
-// x1, x2, x3, ...
-// w1, w2, w3, ...
-// y = x1*w1 + x2*w2 + x3*w3 + ... + bias
-
+/*
 double cost(double w, double b){
 
     double result = 0.0;
@@ -83,32 +74,29 @@ double cost(double w, double b){
         double y = x*w + b; // single artificial neuron mathematical model
         double d = y - train[i][1];
         result += d*d;
-
-        //printf("actual : %f, expected: %f\n", y, train[i][1]);
     }
 
     result /= train_count;
 
     return result;
 }
-
+*/
 // ------------------------------
 
 double cost_two_inputs(double w1, double w2, double bias){
 
     double result = 0.0;
 
-    for(size_t i = 0; i < or_train_count; ++i){
+    for(size_t i = 0; i < train_count(or_train); ++i){
         double x1 = or_train[i][0];
         double x2 = or_train[i][1];
         double y = sigmoid(x1*w1 + x2*w2 + bias); // single artificial neuron mathematical model (with two inputs and a bias)
         double d = y - or_train[i][2];
         result += d*d;
 
-        //printf("actual : %f, expected: %f\n", y, train[i][1]);
     }
 
-    result /= or_train_count;
+    result /= train_count(or_train);
 
     return result;
 }
@@ -120,18 +108,14 @@ int main(){
     // menu();  
     randomize();
     
-    // mathematical model:
-    // y = x * w + bias ; --> output = input * weight + bias 
-    
+    double w1 = rand_double();
+    double w2 = rand_double();
+    double b  = rand_double();
 
-    double w1 = rand_double()*10 - 5; // random number from 0 to 10
-    double w2 = rand_double()*10 - 5;
-    double b  = rand_double()*10 - 5;  // random number from 0 to 5
+    double eps = 1e-1;
+    double rate = 1e-1;
 
-    double eps = 1e-3;
-    double rate = 1e-3;
-
-    size_t epoch = 1000;
+    size_t epoch = 10000;
 
     for(size_t i = 0; i < epoch; ++i){
         

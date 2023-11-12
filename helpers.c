@@ -6,7 +6,7 @@ void randomize(void){
 }
 
 void dline(void){
-    printf("---------------------------------------------\n");
+    printf("----------------------------------------------------------------\n");
 }
 
 void menu(void){ // inputs should not be void 

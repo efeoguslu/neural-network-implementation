@@ -9,12 +9,6 @@
 
 #define EULER_NUMBER 2.71828182846
 
-// --- Move these elsewhere ---
-
-void randomize(void);
-void dline(void);
-void menu(void);
-
 // ---------------------------------------------------------
 
 double identity(double);
