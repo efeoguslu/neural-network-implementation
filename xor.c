@@ -1,8 +1,11 @@
+
+/*
 #include "cost.h"
 #include "activation.h"
 #include "helpers.h"
 #include "xor.h"
 
+/*
 // ------------------------------------------------------------------
 
 double forward(Xor m, double x1, double x2){
@@ -20,8 +23,6 @@ double forward(Xor m, double x1, double x2){
 size_t xor_train_count = 4;
 
 // ------------------------------------------------------------------
-
-
 
 double xor_cost(Xor m){
 
@@ -76,3 +77,5 @@ void print_xor(Xor m){
 }
 
 // ------------------------------------------------------------------
+
+*/
