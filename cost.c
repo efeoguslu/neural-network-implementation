@@ -39,7 +39,6 @@ sample nand_train[] = {
 
 // ( x | y ) & ~( x & y )
 
-
 sample xor_train[] = {
     {0, 0, 0},
     {1, 0, 1},
@@ -48,8 +47,6 @@ sample xor_train[] = {
 };
 
 sample *train = xor_train;
-
-
 
 // ********************************************************************************
 
@@ -77,7 +74,6 @@ double cost_two_inputs(double w1, double w2, double bias){
     }
 
     result /= train_count;
-
     return result;
 }
 
@@ -95,22 +91,18 @@ double forward(Xor m, double x1, double x2){
 
 // ------------------------------------------------------------------
 
-size_t xor_train_count = 4;
-
-// ------------------------------------------------------------------
-
 double xor_cost(Xor m){
 
     double result = 0.0;
 
-    for(size_t i = 0; i < xor_train_count; ++i){
+    for(size_t i = 0; i < train_count; ++i){
         double x1 = train[i][0];
         double x2 = train[i][1];
         double y = forward(m, x1, x2);
         double d = y - train[i][2];
         result += d*d;
     }
-    result /= xor_train_count;
+    result /= train_count;
     return result;
 }
 
@@ -152,3 +144,92 @@ void print_xor(Xor m){
 }
 
 // ------------------------------------------------------------------
+
+// getting the gradient: 
+
+Xor finite_difference(Xor m, double eps){
+
+    Xor g; // gradient 
+    double c = xor_cost(m);      // getting the previous cost
+    double saved = m.or_w1;      // saving the or weight of now
+
+    m.or_w1 += eps;              // add eps to weight
+    g.or_w1 = (xor_cost(m) - c)/eps; // find the derivative
+    m.or_w1 = saved;             // restore
+
+    // --
+
+    saved = m.or_w2;
+    m.or_w2 += eps;
+    g.or_w2 = (xor_cost(m) - c)/eps;
+    m.or_w2 = saved;
+
+    // --
+
+    saved = m.or_b;
+    m.or_b += eps;
+    g.or_b = (xor_cost(m) - c)/eps;
+    m.or_b = saved;
+
+    // --
+
+    saved = m.and_w1;
+    m.and_w1 += eps;
+    g.and_w1 = (xor_cost(m) - c)/eps;
+    m.and_w1 = saved;
+
+    // --
+
+    saved = m.and_w2;
+    m.and_w2 += eps;
+    g.and_w2 = (xor_cost(m) - c)/eps;
+    m.and_w2 = saved;
+
+    // --
+
+    saved = m.and_b;
+    m.and_b += eps;
+    g.and_b = (xor_cost(m) - c)/eps;
+    m.and_b = saved;
+
+    // --
+
+    saved = m.nand_w1;
+    m.nand_w1 += eps;
+    g.nand_w1 = (xor_cost(m) - c)/eps;
+    m.nand_w1 = saved;
+
+    // --
+
+    saved = m.nand_w2;
+    m.nand_w2 += eps;
+    g.nand_w2 = (xor_cost(m) - c)/eps;
+    m.nand_w2 = saved;
+
+    // --
+
+    saved = m.nand_b;
+    m.nand_b += eps;
+    g.nand_b = (xor_cost(m) - c)/eps;
+    m.nand_b = saved;
+
+    return g;
+}
+
+// train:
+
+Xor subtract_gradient(Xor m, Xor g, double rate){
+    m.or_w1 -= rate*g.or_w1;
+    m.or_w2 -= rate*g.or_w2;
+    m.or_b  -= rate*g.or_b;
+
+    m.and_w1 -= rate*g.and_w1;
+    m.and_w2 -= rate*g.and_w2;
+    m.and_b  -= rate*g.and_b;
+
+    m.nand_w1 -= rate*g.nand_w1;
+    m.nand_w2 -= rate*g.nand_w2;
+    m.nand_b  -= rate*g.nand_b;
+
+    return m;
+}

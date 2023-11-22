@@ -9,6 +9,8 @@
 
 // ---------------------------------------------------------
 
+// outline of what we expect it to act like. but it can find a better configuration
+
 typedef struct{
     double or_w1;
     double or_w2;
@@ -27,6 +29,8 @@ Xor rand_xor();
 double forward(Xor m, double x1, double x2);
 double xor_cost(Xor m);
 void print_xor(Xor m);
+Xor finite_difference(Xor m, double eps);
+Xor subtract_gradient(Xor m, Xor g, double rate);
 
 
 #endif

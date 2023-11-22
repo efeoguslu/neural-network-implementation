@@ -41,6 +41,8 @@ void test_model(double w1, double w2, double bias){
     }
 }
 
+
+
 double rand_double(void) 
 {
     return (double)rand() / (double)RAND_MAX;

@@ -11,8 +11,29 @@ int main(){
     randomize();
 
     Xor m = rand_xor();
+    printf("original and initial random model:\n");
     print_xor(m);
+    dline();
 
+    double eps = 1e-1;
+    double rate = 1e-1;
+    
+    for(size_t i = 0; i < 20*1000; ++i){
+
+        Xor g = finite_difference(m, eps);
+        m = subtract_gradient(m, g, rate);
+        printf("cost = %lf\n", xor_cost(m));
+    }
+
+    dline();
+    
+    for(size_t i = 0; i < 2; ++i){
+        for(size_t j = 0; j < 2; ++j){
+            printf("%zu ^ %zu = %lf\n", i, j, forward(m, i, j));
+        }
+    }
+
+    
     return 0;
 
 
@@ -32,8 +53,8 @@ int main(){
     double w2 = rand_double();
     double b  = rand_double();
 
-    double eps = 1e-1;
-    double rate = 1e-1;
+    //double eps = 1e-1;
+    //double rate = 1e-1;
 
     size_t epoch = 10000;
 
