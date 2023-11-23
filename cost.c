@@ -46,6 +46,13 @@ sample xor_train[] = {
     {1, 1, 0},
 };
 
+sample xnor_train[] = {
+    {0, 0, 1},
+    {1, 0, 0},
+    {0, 1, 0},
+    {1, 1, 1},
+};
+
 sample *train = xor_train;
 
 // ********************************************************************************
@@ -233,3 +240,29 @@ Xor subtract_gradient(Xor m, Xor g, double rate){
 
     return m;
 }
+
+void test_xor_model(Xor m){
+    printf("\nTest:\n");
+    for(size_t i = 0; i < 2; ++i){
+        for(size_t j = 0; j < 2; ++j){
+            printf("%zu | %zu = %f\n", i, j, forward(m, i, j));
+        }
+    }
+}
+
+/*
+void train_model(Xor m){
+
+    double eps = 1e-1;
+    double rate = 1e-1;
+    
+    for(size_t i = 0; i < 20*1000; ++i){
+
+        Xor g = finite_difference(m, eps);
+        m = subtract_gradient(m, g, rate);
+        printf("cost = %lf\n", xor_cost(m));
+    }
+
+}
+
+*/

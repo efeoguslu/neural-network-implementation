@@ -10,32 +10,40 @@ int main(){
 
     randomize();
 
+    FILE *file = fopen("cost.txt", "w");
+
+    if(file == NULL){
+        printf("error opening file!\n");
+        exit(1);
+    }
+
     Xor m = rand_xor();
     printf("original and initial random model:\n");
     print_xor(m);
     dline();
 
+    //train_model(m);
+
     double eps = 1e-1;
     double rate = 1e-1;
     
-    for(size_t i = 0; i < 20*1000; ++i){
+    for(size_t i = 0; i < 50*1000; ++i){
 
         Xor g = finite_difference(m, eps);
         m = subtract_gradient(m, g, rate);
-        printf("cost = %lf\n", xor_cost(m));
+        double output = xor_cost(m);
+        printf("cost = %lf\n", output);
+        fprintf(file, "%lf\n", output);
     }
 
-    dline();
-    
-    for(size_t i = 0; i < 2; ++i){
-        for(size_t j = 0; j < 2; ++j){
-            printf("%zu ^ %zu = %lf\n", i, j, forward(m, i, j));
-        }
-    }
+    fclose(file);
 
-    
+    dline();    
+    test_xor_model(m);
+
     return 0;
 
+}
 
 
 
@@ -46,6 +54,7 @@ int main(){
 
     // --------------------------------------------------------------------------------------------
     
+    /*
     // menu();  
     randomize();
     
@@ -80,3 +89,5 @@ int main(){
 
     test_model(w1, w2, b);
 }
+
+*/

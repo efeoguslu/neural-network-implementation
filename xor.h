@@ -31,6 +31,8 @@ double xor_cost(Xor m);
 void print_xor(Xor m);
 Xor finite_difference(Xor m, double eps);
 Xor subtract_gradient(Xor m, Xor g, double rate);
+void test_xor_model(Xor m);
+void train_model(Xor m);
 
 
 #endif
