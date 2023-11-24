@@ -6,11 +6,11 @@ int main(){
 
     randomize();
 
-    
+    /*
     int num_layers;
     int* neurons_per_layer;
     menu(&num_layers, &neurons_per_layer);
-    
+    */
 
     FILE *cost_file = fopen("cost.txt", "w");
 
