@@ -9,10 +9,13 @@
 int main(){
 
     randomize();
+    int num_layers;
+    int* neurons_per_layer;
+    menu(&num_layers, &neurons_per_layer);
 
-    FILE *file = fopen("cost.txt", "w");
+    FILE *cost_file = fopen("cost.txt", "w");
 
-    if(file == NULL){
+    if(cost_file == NULL){
         printf("error opening file!\n");
         exit(1);
     }
@@ -33,10 +36,10 @@ int main(){
         m = subtract_gradient(m, g, rate);
         double output = xor_cost(m);
         printf("cost = %lf\n", output);
-        fprintf(file, "%lf\n", output);
+        fprintf(cost_file, "%lf\n", output);
     }
 
-    fclose(file);
+    fclose(cost_file);
 
     dline();    
     test_xor_model(m);

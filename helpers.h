@@ -9,7 +9,7 @@
 
 void randomize(void);
 void dline(void);
-void menu(void);
+void menu(int* num_layers, int** neurons_per_layer);
 void test_model(double w1, double w2, double b);
 double rand_double(void);
 

@@ -9,26 +9,35 @@ void dline(void){
     printf("----------------------------------------------------------------\n");
 }
 
-void menu(void){ // inputs should not be void 
-
+void menu(int* num_layers, int** neurons_per_layer) {
     printf("\nWelcome to the Neural Network Implementation Project in C!\n");
-    dline();
-    printf("Please Choose an Activation Function: \n");
-    printf("1. Identity\n2. Binary Step\n3. Sigmoid\n");
-
-    // scan the input
 
     printf("\nPlease enter the number of layers: ");
+    scanf("%d", num_layers);
 
-    // scan the number of layers
-
+    *neurons_per_layer = (int*) malloc(sizeof(int) * (*num_layers));
     printf("\nPlease enter the number of neurons in each layer: ");
+    for (int i = 0; i < *num_layers; i++) {
+        printf("\nEnter one number of neurons for layer %d: ", i+1);
+        scanf("%d", &(*neurons_per_layer)[i]);
+    }
 
-    // scan the number of neurons in each layer, with a for loop, according to the # of layers
+    FILE *params_file = fopen("params.txt", "w");
+    if (params_file == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
 
-    printf("\n");
+    fprintf(params_file, "%d\n", *num_layers);
 
-}
+    for (int i = 0; i < *num_layers; i++) {
+        fprintf(params_file, "%d\n", (*neurons_per_layer)[i]);
+    }
+
+    fclose(params_file);
+    }
+
+// -----------------------------------------------------------------------------------------------
 
 // Maybe Move Elsewhere...
 
@@ -40,8 +49,6 @@ void test_model(double w1, double w2, double bias){
         }
     }
 }
-
-
 
 double rand_double(void) 
 {
