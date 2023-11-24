@@ -15,7 +15,7 @@ void menu(int* num_layers, int** neurons_per_layer) {
     printf("\nPlease enter the number of layers: ");
     scanf("%d", num_layers);
 
-    *neurons_per_layer = (int*) malloc(sizeof(int) * (*num_layers));
+    *neurons_per_layer = (int*)malloc(sizeof(int) * (*num_layers));
     printf("\nPlease enter the number of neurons in each layer: ");
     for (int i = 0; i < *num_layers; i++) {
         printf("\nEnter one number of neurons for layer %d: ", i+1);
@@ -38,8 +38,6 @@ void menu(int* num_layers, int** neurons_per_layer) {
     }
 
 // -----------------------------------------------------------------------------------------------
-
-// Maybe Move Elsewhere...
 
 void test_model(double w1, double w2, double bias){
     printf("\nTest:\n");

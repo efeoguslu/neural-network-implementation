@@ -250,19 +250,3 @@ void test_xor_model(Xor m){
     }
 }
 
-/*
-void train_model(Xor m){
-
-    double eps = 1e-1;
-    double rate = 1e-1;
-    
-    for(size_t i = 0; i < 20*1000; ++i){
-
-        Xor g = finite_difference(m, eps);
-        m = subtract_gradient(m, g, rate);
-        printf("cost = %lf\n", xor_cost(m));
-    }
-
-}
-
-*/
