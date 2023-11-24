@@ -1,6 +1,6 @@
-#include "cost.h"
 #include "helpers.h"
 #include "activation.h"
+#include "xor.h"
 
 // ---- TRAINING SETS ---- 
 

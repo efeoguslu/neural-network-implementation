@@ -1,6 +1,6 @@
 #include "activation.h"
 #include "helpers.h"
-#include "cost.h"
+#include "xor.h"
 
 // ********************************************************************************
 // 2.01.00 ------
