@@ -249,3 +249,20 @@ void test_xor_model(Xor m){
     }
 }
 
+// -------------------------------------------------------------------------------------
+
+void save_weights(const char *filename, Xor model) {
+
+    FILE *file = fopen(filename, "w");
+    
+    if (file == NULL) {
+        printf("Error opening file for writing\n");
+        return exit(1);
+    }
+
+    fprintf(file, "%lf %lf %lf\n", model.or_w1, model.or_w2, model.or_b);
+    fprintf(file, "%lf %lf %lf\n", model.nand_w1, model.nand_w2, model.nand_b);
+    fprintf(file, "%lf %lf %lf\n", model.and_w1, model.and_w2, model.and_b);
+
+    fclose(file);
+}

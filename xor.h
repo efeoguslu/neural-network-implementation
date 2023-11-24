@@ -35,6 +35,6 @@ void print_xor(Xor m);
 Xor finite_difference(Xor m, double eps);
 Xor subtract_gradient(Xor m, Xor g, double rate);
 void test_xor_model(Xor m);
+void save_weights(const char *filename, Xor model);
 
 #endif
-
