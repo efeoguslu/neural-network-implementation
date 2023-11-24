@@ -1,7 +1,6 @@
 #include "activation.h"
 #include "helpers.h"
 #include "cost.h"
-#include "xor.h"
 
 // ********************************************************************************
 // 2.01.00 ------
@@ -10,11 +9,9 @@ int main(){
 
     randomize();
 
-    
     int num_layers;
     int* neurons_per_layer;
     menu(&num_layers, &neurons_per_layer);
-    
 
     FILE *cost_file = fopen("cost.txt", "w");
 
@@ -32,7 +29,6 @@ int main(){
     double rate = 1e-1;
     
     for(size_t i = 0; i < 50*1000; ++i){
-
         Xor g = finite_difference(m, eps);
         m = subtract_gradient(m, g, rate);
         double output = xor_cost(m);
