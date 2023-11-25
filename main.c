@@ -1,19 +1,30 @@
-#define MATRIX_IMPLEMENTATION
 #include "activation.h"
 #include "helpers.h"
 #include "xor.h"
 #include "matrix.h"
 
-// ml_2 --> 53.00
-
 int main(){
 
-    Mat matrix = mat_alloc(2, 2);
-    mat_print(matrix);
+    randomize();
+    
+    Mat a = mat_alloc(1,1);
+    mat_rand(a, 0.0, 1.0);
+    mat_print(a);
+    dline();
 
+    Mat b = mat_alloc(1,1);
+    mat_rand(b, 0.0, 1.0);
+    mat_print(b);
+    dline();
+
+    Mat dst = mat_alloc(1,1);
+
+    mat_dot(dst, a, b);
+    mat_print(dst);
 
     return 0;
 }
+
 
 /*
     randomize();
