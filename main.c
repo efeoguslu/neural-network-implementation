@@ -1,16 +1,26 @@
+#define MATRIX_IMPLEMENTATION
 #include "activation.h"
 #include "helpers.h"
 #include "xor.h"
+#include "matrix.h"
+
+// ml_2 --> 53.00
 
 int main(){
 
+    Mat matrix = mat_alloc(2, 2);
+    mat_print(matrix);
+
+
+    return 0;
+}
+
+/*
     randomize();
 
-    /*
     int num_layers;
     int* neurons_per_layer;
     menu(&num_layers, &neurons_per_layer);
-    */
 
     FILE *cost_file = fopen("cost.txt", "w");
 
@@ -47,3 +57,4 @@ int main(){
     return 0;
 
 }
+*/
