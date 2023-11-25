@@ -4,23 +4,37 @@
 #include "matrix.h"
 
 int main(){
-
+    
     randomize();
     
-    Mat a = mat_alloc(1,1);
-    mat_rand(a, 0.0, 1.0);
-    mat_print(a);
+    // modeling XOR with matrix framework
+
+    // first layer: 
+
+    Mat w1 = mat_alloc(2, 2);
+    Mat b1 = mat_alloc(1, 2);
+
+    // second layer:
+
+    Mat w2 = mat_alloc(2, 1);
+    Mat b2 = mat_alloc(1, 1);
+
+    // randomize all layers:
+    
+    mat_rand(w1, 0.0, 1.0);
+    mat_rand(b1, 0.0, 1.0);
+    mat_rand(w2, 0.0, 1.0);
+    mat_rand(b2, 0.0, 1.0);
+
+    mat_print(w1, "w1");
     dline();
-
-    Mat b = mat_alloc(1,1);
-    mat_rand(b, 0.0, 1.0);
-    mat_print(b);
+    mat_print(b1, "b1");
     dline();
-
-    Mat dst = mat_alloc(1,1);
-
-    mat_dot(dst, a, b);
-    mat_print(dst);
+    mat_print(w2, "w2");
+    dline();
+    mat_print(b2, "b2");
+   
+    
 
     return 0;
 }

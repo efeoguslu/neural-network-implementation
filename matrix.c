@@ -15,7 +15,8 @@ Mat mat_alloc(size_t rows, size_t cols){
 
 void mat_dot(Mat dst, Mat a, Mat b){
 
-    // checking if matrices are eligible for dot product: 
+    // checking if matrices are eligible for dot product:
+
     MATRIX_ASSERT(a.cols == b.rows);
     size_t n = a.cols;
 
@@ -51,14 +52,18 @@ void mat_sum(Mat dst, Mat a){
     }
 }
 
-void mat_print(Mat m){
+void mat_print(Mat m, const char* name){
 
+    printf("\nMatrix with %zu rows and %zu columns:\n", m.rows, m.cols);
+
+    printf("\n%s = [\n", name);
     for(size_t i = 0; i < m.rows; ++i){
         for(size_t j = 0; j < m.cols; ++j){
-            printf("%lf ", MAT_AT(m, i, j));
+            printf("    %lf ", MAT_AT(m, i, j));
         }
         printf("\n");
     }
+    printf("]\n");
     
 }
 
@@ -71,3 +76,5 @@ void mat_rand(Mat m, double low, double high){
         
     }
 }
+
+
