@@ -2,12 +2,12 @@
 #include "helpers.h"
 #include "xor.h"
 #include "matrix.h"
-
+//2 --> 1.59
 typedef struct{
 
-    Mat a0;
-    Mat w1, b1, a1;
-    Mat w2, b2, a2;
+    Mat a0, a1, a2;
+    Mat w1, b1;
+    Mat w2, b2;
 
 } Exor;
 
@@ -51,8 +51,6 @@ double cost_exor(Exor m, Mat ti, Mat to){
 
     return c/n;
 }   
-
-
 
 double td[] = {
     0, 0, 0,

@@ -38,7 +38,7 @@ void mat_dot(Mat dst, Mat a, Mat b){
 
 Mat mat_row(Mat m, size_t row){
 
-    (Mat){ 
+    return (Mat){ 
         .rows = 1,
         .cols = m.cols,
         .stride = m.stride,
@@ -51,7 +51,7 @@ void mat_copy(Mat dst, Mat src){
     MATRIX_ASSERT(dst.cols == src.cols);
 
     for(size_t i = 0; i < dst.rows; ++i){
-        for(size_t j = 0; i < dst.cols; ++j){
+        for(size_t j = 0; j < dst.cols; ++j){
             MAT_AT(dst, i, j) = MAT_AT(src, i, j);
         }
     }
