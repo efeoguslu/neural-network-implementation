@@ -20,12 +20,9 @@ void mat_dot(Mat dst, Mat a, Mat b){
 
     MATRIX_ASSERT(a.cols == b.rows);
     size_t n = a.cols;
-
     MATRIX_ASSERT(dst.rows == a.rows);
     MATRIX_ASSERT(dst.cols == b.cols);
-
     // dot product operation:
-
     for(size_t i = 0; i < dst.rows; ++i){
         for(size_t j = 0; j < dst.cols; ++j){
             MAT_AT(dst, i, j) = 0;
@@ -102,7 +99,7 @@ void mat_rand(Mat m, double low, double high){
 void mat_sig(Mat m){
     for(size_t i = 0; i < m.rows; ++i){
         for(size_t j = 0; j < m.cols; ++j){
-            MAT_AT(m, i, j) = sigmoid(MAT_AT(m, i, j));
+            MAT_AT(m, i, j) = g_activation_func(MAT_AT(m, i, j));
         }
     }
 }

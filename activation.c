@@ -38,3 +38,9 @@ double d_sigmoid(double n){
 }
 
 // -----------------------------------------------
+
+double relu(double n){
+    return n < 0 ? 0 : n;
+}
+
+ActivationFunction g_activation_func = sigmoid; // default to sigmoid

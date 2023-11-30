@@ -2,7 +2,10 @@
 #include "helpers.h"
 #include "xor.h"
 #include "matrix.h"
+
 //2 --> 1.59
+/*
+
 typedef struct{
 
     Mat a0, a1, a2;
@@ -58,7 +61,56 @@ double td[] = {
     1, 0, 1,
     1, 1, 0,
 };
+*/
 
+
+int main(){
+
+    randomize();
+    
+    int num_layers;
+    int* neurons_per_layer;
+    ActivationFunction activation_func;
+
+    menu(&num_layers, &neurons_per_layer, &activation_func);
+    
+
+    FILE *cost_file = fopen("cost.txt", "w");
+
+    if(cost_file == NULL){
+        printf("error opening file!\n");
+        exit(1);
+    }
+
+    Xor m = rand_xor();
+    printf("original and initial random model:\n");
+    print_xor(m);
+    dline();
+
+    double eps = 1e-1;
+    double rate = 1e-1;
+    
+    for(size_t i = 0; i < 50*1000; ++i){
+        Xor g = finite_difference(m, eps);
+        m = subtract_gradient(m, g, rate);
+        double output = xor_cost(m);
+        printf("cost = %lf\n", output);
+        fprintf(cost_file, "%lf\n", output);
+    }
+
+    fclose(cost_file);
+
+    dline();    
+    test_xor_model(m);
+
+    // TESTING:
+
+    save_weights("weights.txt", m);
+
+    return 0;
+}
+
+/*
 int main(){
     
     randomize();
@@ -130,7 +182,7 @@ int main(){
 
     return 0;
 }
-
+*/
 
 /*
     randomize();

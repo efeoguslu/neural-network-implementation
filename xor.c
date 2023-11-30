@@ -85,22 +85,21 @@ double cost_two_inputs(double w1, double w2, double bias){
 
 // ----------------------------------------------------------------------------------------------------
 
-double forward(Xor m, double x1, double x2){
+// x ^ y == (x | y) & ~(x & y)
 
+double forward(Xor m, double x1, double x2){
     // outputs of the first layer:
-    double a = sigmoid(m.or_w1*x1 + m.or_w2*x2 + m.or_b);
-    double b = sigmoid(m.nand_w1*x1 + m.nand_w2*x2 + m.nand_b);
-    
+    double a = g_activation_func(m.or_w1*x1 + m.or_w2*x2 + m.or_b);
+    double b = g_activation_func(m.nand_w1*x1 + m.nand_w2*x2 + m.nand_b);
     // returning the output of the last layer:
-    return sigmoid(a*m.and_w1 + b*m.and_w2 + m.and_b);
+    return g_activation_func(a*m.and_w1 + b*m.and_w2 + m.and_b);
 }
+
 
 // ------------------------------------------------------------------
 
 double xor_cost(Xor m){
-
     double result = 0.0;
-
     for(size_t i = 0; i < train_count; ++i){
         double x1 = train[i][0];
         double x2 = train[i][1];
@@ -152,7 +151,6 @@ void print_xor(Xor m){
 // ------------------------------------------------------------------
 
 // getting the gradient: 
-
 Xor finite_difference(Xor m, double eps){
 
     Xor g; // gradient 
@@ -162,14 +160,12 @@ Xor finite_difference(Xor m, double eps){
     m.or_w1 += eps;              // add eps to weight
     g.or_w1 = (xor_cost(m) - c)/eps; // find the derivative
     m.or_w1 = saved;             // restore
-
     // --
-
     saved = m.or_w2;
     m.or_w2 += eps;
     g.or_w2 = (xor_cost(m) - c)/eps;
     m.or_w2 = saved;
-
+    // continued for each parameter...
     // --
 
     saved = m.or_b;
@@ -241,10 +237,10 @@ Xor subtract_gradient(Xor m, Xor g, double rate){
 }
 
 void test_xor_model(Xor m){
-    printf("\nTest:\n");
+    printf("\nTest for XOR model:\n");
     for(size_t i = 0; i < 2; ++i){
         for(size_t j = 0; j < 2; ++j){
-            printf("%zu | %zu = %f\n", i, j, forward(m, i, j));
+            printf("%zu ^ %zu = %f\n", i, j, forward(m, i, j));
         }
     }
 }
@@ -266,3 +262,5 @@ void save_weights(const char *filename, Xor model) {
 
     fclose(file);
 }
+
+

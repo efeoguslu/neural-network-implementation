@@ -28,6 +28,7 @@ typedef struct{
     double and_b;
 } Xor;
 
+
 Xor rand_xor();
 double forward(Xor m, double x1, double x2);
 double xor_cost(Xor m);
