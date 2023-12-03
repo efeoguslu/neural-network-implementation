@@ -15,9 +15,7 @@ Mat mat_alloc(size_t rows, size_t cols){
 }
 
 void mat_dot(Mat dst, Mat a, Mat b){
-
     // checking if matrices are eligible for dot product:
-
     MATRIX_ASSERT(a.cols == b.rows);
     size_t n = a.cols;
     MATRIX_ASSERT(dst.rows == a.rows);
@@ -34,7 +32,6 @@ void mat_dot(Mat dst, Mat a, Mat b){
 }
 
 Mat mat_row(Mat m, size_t row){
-
     return (Mat){ 
         .rows = 1,
         .cols = m.cols,
@@ -55,18 +52,13 @@ void mat_copy(Mat dst, Mat src){
 }
 
 void mat_sum(Mat dst, Mat a){
-
     // checking if matrices are eligible to summation:
-
     MATRIX_ASSERT(dst.rows == a.rows);
     MATRIX_ASSERT(dst.cols == a.cols);
-
     // the summation:
-
     for(size_t i = 0; i < dst.rows; ++i){
         for(size_t j = 0; j < dst.cols; ++j){
             MAT_AT(dst, i, j) += MAT_AT(a, i, j);
-
         }
     }
 }
@@ -87,7 +79,6 @@ void mat_print(Mat m, const char* name){
 }
 
 void mat_rand(Mat m, double low, double high){
-
     for(size_t i = 0; i < m.rows; ++i){
         for(size_t j = 0; j < m.cols; ++j){
             MAT_AT(m, i, j) = rand_double()*(high - low) + low;

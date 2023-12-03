@@ -160,6 +160,8 @@ Xor finite_difference(Xor m, double eps){
     m.or_w1 += eps;              // add eps to weight
     g.or_w1 = (xor_cost(m) - c)/eps; // find the derivative
     m.or_w1 = saved;             // restore
+
+    
     // --
     saved = m.or_w2;
     m.or_w2 += eps;

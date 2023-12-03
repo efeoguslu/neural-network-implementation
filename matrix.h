@@ -16,7 +16,6 @@
 #endif // MATRIX_ASSERT
 
 // defining the shape of the matrix:
-
 typedef struct{
     size_t rows;
     size_t cols;
@@ -32,7 +31,6 @@ void mat_sum(Mat dst, Mat a);
 void mat_print(Mat m, const char *name);
 void mat_rand(Mat m, double low, double high);
 void mat_sig(Mat m);
-
 Mat mat_row(Mat m, size_t row);
 void mat_copy(Mat dst, Mat src);
 
