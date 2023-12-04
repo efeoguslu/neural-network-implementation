@@ -4,7 +4,7 @@
 #include "matrix.h"
 
 //2 --> 1.59
-/*
+
 
 typedef struct{
 
@@ -13,6 +13,23 @@ typedef struct{
     Mat w2, b2;
 
 } Exor;
+
+Exor xor_alloc(void){
+    Exor m;     
+    // modeling XOR with matrix framework
+    // input, represented as a matrix:
+    m.a0 = mat_alloc(1,2);
+    // first layer: 
+    m.w1 = mat_alloc(2, 2);
+    m.b1 = mat_alloc(1, 2);
+    // output of first layer:
+    m.a1 = mat_alloc(1, 2);
+    // second layer:
+    m.w2 = mat_alloc(2, 1);
+    m.b2 = mat_alloc(1, 1);
+    m.a2 = mat_alloc(1, 1);
+    return m;
+}
 
 void forward_exor(Exor m){
 
@@ -55,17 +72,159 @@ double cost_exor(Exor m, Mat ti, Mat to){
     return c/n;
 }   
 
+void finite_diff(Exor m, Exor g, double eps, Mat ti, Mat to){
+    double saved;
+    double c = cost_exor(m, ti, to);
+
+    for(size_t i = 0; i < m.w1.rows; ++i){
+        for(size_t j = 0; j < m.w1.cols; ++j){
+            saved = MAT_AT(m.w1, i, j);
+            MAT_AT(m.w1, i, j) += eps;
+            MAT_AT(g.w1, i, j) = (cost_exor(m, ti, to) - c)/eps;
+
+            MAT_AT(m.w1, i, j) = saved;
+        }
+    }
+
+    for(size_t i = 0; i < m.b1.rows; ++i){
+        for(size_t j = 0; j < m.b1.cols; ++j){
+            saved = MAT_AT(m.b1, i, j);
+            MAT_AT(m.b1, i, j) += eps;
+            MAT_AT(g.b1, i, j) = (cost_exor(m, ti, to) - c)/eps;
+
+            MAT_AT(m.b1, i, j) = saved;
+        }
+    }
+
+    for(size_t i = 0; i < m.w2.rows; ++i){
+        for(size_t j = 0; j < m.w2.cols; ++j){
+            saved = MAT_AT(m.w2, i, j);
+            MAT_AT(m.w2, i, j) += eps;
+            MAT_AT(g.w2, i, j) = (cost_exor(m, ti, to) - c)/eps;
+
+            MAT_AT(m.w2, i, j) = saved;
+        }
+    }
+
+    for(size_t i = 0; i < m.b2.rows; ++i){
+        for(size_t j = 0; j < m.b2.cols; ++j){
+            saved = MAT_AT(m.b2, i, j);
+            MAT_AT(m.b2, i, j) += eps;
+            MAT_AT(g.b2, i, j) = (cost_exor(m, ti, to) - c)/eps;
+
+            MAT_AT(m.b2, i, j) = saved;
+        }
+    }
+}
+
+void xor_learn(Exor m, Exor g, double rate){
+
+    for(size_t i = 0; i < m.w1.rows; ++i){
+        for(size_t j = 0; j < m.w1.cols; ++j){
+            MAT_AT(m.w1, i, j) -= rate*MAT_AT(g.w1, i, j);
+        }
+    }
+    
+    for(size_t i = 0; i < m.b1.rows; ++i){
+        for(size_t j = 0; j < m.b1.cols; ++j){
+            MAT_AT(m.b1, i, j) -= rate*MAT_AT(g.b1, i, j);
+        }
+    }
+
+    for(size_t i = 0; i < m.w2.rows; ++i){
+        for(size_t j = 0; j < m.w2.cols; ++j){
+            MAT_AT(m.w2, i, j) -= rate*MAT_AT(g.w2, i, j);
+        }
+    }
+
+    for(size_t i = 0; i < m.b2.rows; ++i){
+        for(size_t j = 0; j < m.b2.cols; ++j){
+            MAT_AT(m.b2, i, j) -= rate*MAT_AT(g.b2, i, j);
+        }
+    }
+}
+
 double td[] = {
     0, 0, 0,
     0, 1, 1,
     1, 0, 1,
     1, 1, 0,
 };
-*/
+
 
 
 int main(){
 
+    randomize();
+    
+    size_t stride = 3;
+    size_t n = sizeof(td)/sizeof(td[0])/stride;
+
+    Mat ti = {
+        .rows = n,
+        .cols = 2,
+        .stride = stride,
+        .es = td
+    };
+
+    Mat to = {
+        .rows = n,
+        .cols = 1,
+        .stride = stride,
+        .es = td + 2,
+    };
+
+    // mat_print(ti, "ti");
+    // mat_print(to, "to");
+
+    Exor m = xor_alloc();
+    Exor g = xor_alloc();
+
+    // randomize all layers:
+    
+    mat_rand(m.w1, 0.0, 1.0);
+    mat_rand(m.b1, 0.0, 1.0);
+    mat_rand(m.w2, 0.0, 1.0);
+    mat_rand(m.b2, 0.0, 1.0);
+
+    double eps = 1e-1;
+    double rate = 1e-1; 
+
+    FILE *fp;  // File pointer
+    fp = fopen("cost.txt", "w");  // Open file in write mode
+
+    if (fp == NULL) {
+        fprintf(stderr, "Error opening file\n");
+        return 1;
+    }
+
+    printf("cost = %lf\n", cost_exor(m, ti, to));
+
+    for(size_t i = 0; i < 50*1000; ++i){
+        finite_diff(m, g, eps, ti, to);
+        xor_learn(m, g, rate);
+        printf("cost = %lf\n", cost_exor(m, ti, to));
+        fprintf(fp, "%lf\n", cost_exor(m, ti, to));
+    }
+
+    dline();
+
+    for(size_t i = 0; i < 2; ++i){
+        for(size_t j = 0; j < 2; ++j){
+
+            MAT_AT(m.a0, 0, 0) = i;
+            MAT_AT(m.a0, 0, 1) = j;
+            forward_exor(m);
+            double y = *m.a2.es;
+
+            printf("%zu ^ %zu = %lf\n", i, j, y);
+        }
+    }
+    
+    return 0;
+}
+
+    /*
     randomize();
     
     int num_layers;
@@ -112,118 +271,5 @@ int main(){
 
 /*
 int main(){
-    
-    randomize();
-    
-    size_t stride = 3;
-    size_t n = sizeof(td)/sizeof(td[0])/stride;
+    */
 
-    Mat ti = {
-        .rows = n,
-        .cols = 2,
-        .stride = stride,
-        .es = td
-    };
-
-    Mat to = {
-        .rows = n,
-        .cols = 1,
-        .stride = stride,
-        .es = td + 2,
-    };
-
-    mat_print(ti, "ti");
-    mat_print(to, "to");
-
-    Exor m;
-    
-    // modeling XOR with matrix framework
-
-    // input, represented as a matrix:
-
-    m.a0 = mat_alloc(1,2);
-
-    // first layer: 
-
-    m.w1 = mat_alloc(2, 2);
-    m.b1 = mat_alloc(1, 2);
-
-    // output of first layer:
-
-    m.a1 = mat_alloc(1, 2);
-
-    // second layer:
-
-    m.w2 = mat_alloc(2, 1);
-    m.b2 = mat_alloc(1, 1);
-
-    m.a2 = mat_alloc(1, 1);
-
-    // randomize all layers:
-    
-    mat_rand(m.w1, 0.0, 1.0);
-    mat_rand(m.b1, 0.0, 1.0);
-    mat_rand(m.w2, 0.0, 1.0);
-    mat_rand(m.b2, 0.0, 1.0);
-
-    printf("cost = %lf\n", cost_exor(m, ti, to));
-
-    for(size_t i = 0; i < 2; ++i){
-        for(size_t j = 0; j < 2; ++j){
-
-            MAT_AT(m.a0, 0, 0) = i;
-            MAT_AT(m.a0, 0, 1) = j;
-            forward_exor(m);
-            double y = *m.a2.es;
-
-            printf("%zu ^ %zu = %lf\n", i, j, y);
-        }
-    }
-
-    return 0;
-}
-*/
-
-/*
-    randomize();
-
-    int num_layers;
-    int* neurons_per_layer;
-    menu(&num_layers, &neurons_per_layer);
-
-    FILE *cost_file = fopen("cost.txt", "w");
-
-    if(cost_file == NULL){
-        printf("error opening file!\n");
-        exit(1);
-    }
-
-    Xor m = rand_xor();
-    printf("original and initial random model:\n");
-    print_xor(m);
-    dline();
-
-    double eps = 1e-1;
-    double rate = 1e-1;
-    
-    for(size_t i = 0; i < 50*1000; ++i){
-        Xor g = finite_difference(m, eps);
-        m = subtract_gradient(m, g, rate);
-        double output = xor_cost(m);
-        printf("cost = %lf\n", output);
-        fprintf(cost_file, "%lf\n", output);
-    }
-
-    fclose(cost_file);
-
-    dline();    
-    test_xor_model(m);
-
-    // TESTING:
-
-    save_weights("weights.txt", m);
-
-    return 0;
-
-}
-*/
