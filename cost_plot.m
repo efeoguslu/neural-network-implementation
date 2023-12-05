@@ -14,7 +14,6 @@
 cost_data = dlmread('cost.txt');
 
 
-% Plot each variable in a separate subplot with different colors
 figure(1);
 
 plot(cost_data, '-', 'Color', [0, 0.4470, 0.7410], 'LineWidth', 2);  % Blue color
@@ -23,4 +22,4 @@ xlabel('Epoch');
 ylabel('Cost');
 grid on;
 
-saveas(gcf, 'separate_subplots.png');
+saveas(gcf, 'cost_plot.png');

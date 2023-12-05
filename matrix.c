@@ -3,6 +3,32 @@
 #include "activation.h"
 #include "xor.h"
 
+// size_t arch[] = {2, 4, 2, 1};
+// Network nn = nn_alloc(arch, ARRAY_LEN(layers));
+
+Network nn_alloc(size_t *arch, size_t arch_count){
+
+    MATRIX_ASSERT(arch_count > 0);
+
+    Network nn;
+    nn.count = arch_count - 1; // subtracting the input layer
+
+    nn.ws = MATRIX_MALLOC(sizeof(*nn.ws)*nn.count);
+    MATRIX_ASSERT(nn.ws != NULL);
+    nn.bs = MATRIX_MALLOC(sizeof(*nn.bs)*nn.count);
+    MATRIX_ASSERT(nn.bs != NULL);
+    nn.as = MATRIX_MALLOC(sizeof(*nn.as)*(nn.count + 1));
+    MATRIX_ASSERT(nn.as != NULL);
+
+    nn.as[0] = mat_alloc(1, arch[0]);
+    for(size_t i = 1; i < arch_count; ++i){
+        nn.ws[i - 1] = mat_alloc(nn.as[i - 1].cols, arch[i]);
+        nn.bs[i - 1] = mat_alloc(1, arch[i]);
+        nn.as[i]     = mat_alloc(1, arch[i]);
+    }
+
+    return nn;
+}
 
 Mat mat_alloc(size_t rows, size_t cols){
     Mat m;
