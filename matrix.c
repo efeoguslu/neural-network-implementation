@@ -39,7 +39,6 @@ Mat mat_alloc(size_t rows, size_t cols){
     MATRIX_ASSERT(m.es != NULL);
     return m;
 }
-
 void mat_dot(Mat dst, Mat a, Mat b){
     // checking if matrices are eligible for dot product:
     MATRIX_ASSERT(a.cols == b.rows);
@@ -91,7 +90,7 @@ void mat_sum(Mat dst, Mat a){
 
 void mat_print(Mat m, const char* name){
 
-    printf("\nMatrix with %zu rows and %zu columns:\n", m.rows, m.cols);
+    printf("\nMatrix with %u rows and %u columns:\n", m.rows, m.cols);
 
     printf("\n%s = [\n", name);
     for(size_t i = 0; i < m.rows; ++i){

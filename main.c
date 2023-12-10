@@ -12,20 +12,26 @@ typedef struct{
 
 } Exor;
 
-Exor xor_alloc(void){
-    Exor m;     
-    // modeling XOR with matrix framework
-    // input, represented as a matrix:
-    m.a0 = mat_alloc(1,2);
-    // first layer: 
+Exor xor_alloc(void) {
+    Exor m;
+    
+    // Allocate memory for the input matrix
+    m.a0 = mat_alloc(1, 2);
+    
+    // Allocate memory for the first layer weights and biases
     m.w1 = mat_alloc(2, 2);
     m.b1 = mat_alloc(1, 2);
-    // output of first layer:
+    
+    // Allocate memory for the output of the first layer
     m.a1 = mat_alloc(1, 2);
-    // second layer:
+    
+    // Allocate memory for the second layer weights and biases
     m.w2 = mat_alloc(2, 1);
     m.b2 = mat_alloc(1, 1);
+    
+    // Allocate memory for the output of the second layer
     m.a2 = mat_alloc(1, 1);
+    
     return m;
 }
 
@@ -215,7 +221,7 @@ int main(){
             forward_exor(m);
             double y = *m.a2.es;
 
-            printf("%zu ^ %zu = %lf\n", i, j, y);
+            printf("%u ^ %u = %lf\n", i, j, y);
         }
     }
 

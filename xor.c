@@ -242,7 +242,7 @@ void test_xor_model(Xor m){
     printf("\nTest for XOR model:\n");
     for(size_t i = 0; i < 2; ++i){
         for(size_t j = 0; j < 2; ++j){
-            printf("%zu ^ %zu = %f\n", i, j, forward(m, i, j));
+            printf("%u ^ %u = %lf\n", i, j, forward(m, i, j));
         }
     }
 }
@@ -255,7 +255,7 @@ void save_weights(const char *filename, Xor model) {
     
     if (file == NULL) {
         printf("Error opening file for writing\n");
-        return exit(1);
+        exit(1);
     }
 
     fprintf(file, "%lf %lf %lf\n", model.or_w1, model.or_w2, model.or_b);
