@@ -16,7 +16,7 @@ extern ActivationFunction g_activation_func;
 
 double identity(double);
 int binary_step(double);
-int d_identity(double);
+int d_identity();
 int d_binary_step(double);
 double sigmoid(double n);
 double d_sigmoid(double n);

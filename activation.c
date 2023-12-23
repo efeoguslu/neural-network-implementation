@@ -7,7 +7,7 @@ double identity(double x){
     return x;
 }
 
-int d_identity(double x){
+int d_identity(){
     return 1;
 }
 
