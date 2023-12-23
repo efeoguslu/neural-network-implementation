@@ -2,6 +2,7 @@
 #include "helpers.h"
 #include "xor.h"
 #include "matrix.h"
+#include <time.h>
 
 // training data:
 double td[] = {
@@ -12,6 +13,9 @@ double td[] = {
 };
 
 int main(){
+
+    clock_t start, end;
+    start = clock();
 
     randomize();
 
@@ -72,6 +76,11 @@ int main(){
             printf("%u ^ %u = %lf\n", i, j, MAT_AT(NN_OUTPUT(our_neural_network), 0, 0));
         }
     }
+
+    end = clock();
+    double dblTime = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    printf("\n%lf seconds have passed.\n", dblTime);
 
     return 0;
 }
