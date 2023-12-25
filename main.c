@@ -2,9 +2,8 @@
 #include "helpers.h"
 #include "xor.h"
 #include "matrix.h"
+#include "mnist.h"
 #include <time.h>
-
-// ML3 --> 3.25.00
 
 // training data:
 
@@ -16,7 +15,7 @@ double td[] = {
 };
 
 int main(){
-    
+
     randomize();
     
     size_t stride = 3;
@@ -43,7 +42,6 @@ int main(){
     Network network = nn_alloc(arch, ARRAY_LEN(arch));
     Network gradient = nn_alloc(arch, ARRAY_LEN(arch));
 
-    
 
     FILE *fp;  // File pointer
     fp = fopen("cost.txt", "w");  // Open file in write mode

@@ -1,6 +1,3 @@
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "mnist.h"
 
 // Function to load MNIST data
