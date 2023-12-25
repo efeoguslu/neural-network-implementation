@@ -4,6 +4,8 @@
 #include "matrix.h"
 #include <time.h>
 
+// ML3 --> 3.14.00
+
 // training data:
 double td[] = {
     0, 0, 0,
@@ -40,12 +42,10 @@ int main(){
     
     // memory management:
 
-    Network our_neural_network = nn_alloc(arch, ARRAY_LEN(arch));
+    Network network = nn_alloc(arch, ARRAY_LEN(arch));
     Network gradient = nn_alloc(arch, ARRAY_LEN(arch));
 
-    double eps = 1e-1;
-    double rate = 1e-1;
-    size_t epoch = 50*1000;
+    
 
     FILE *fp;  // File pointer
     fp = fopen("cost.txt", "w");  // Open file in write mode
@@ -55,14 +55,24 @@ int main(){
         return 1;
     }
 
-    nn_rand(our_neural_network, 0, 1);
-    printf("cost = %lf\n", nn_cost(our_neural_network, ti, to));
+    // double eps = 1e-1;
+    double rate = 1e-1;
+    size_t epoch = 50000;
+    nn_rand(network, 0, 1);
+
+    printf("cost = %lf\n", nn_cost(network, ti, to));
 
     for(size_t i = 0; i < epoch; ++i){
-        nn_finite_diff(our_neural_network, gradient, eps, ti, to);
-        nn_learn(our_neural_network, gradient, rate);
-        printf("cost = %lf\n", nn_cost(our_neural_network, ti, to));
-        fprintf(fp, "%lf\n", nn_cost(our_neural_network, ti, to));
+#if 0
+        double eps = 1e-1;
+        nn_finite_diff(network, gradient, eps, ti, to);
+#else
+        nn_backprop(network, gradient, ti, to);
+#endif
+        //NN_PRINT(gradient);
+        nn_learn(network, gradient, rate);
+        printf("cost = %lf\n", nn_cost(network, ti, to));
+        fprintf(fp, "%lf\n", nn_cost(network, ti, to));
     }
 
     fclose(fp);
@@ -70,10 +80,10 @@ int main(){
     printf("\nTest:\n");
     for(size_t i = 0; i < 2; ++i){
         for(size_t j = 0; j < 2; ++j){
-            MAT_AT(NN_INPUT(our_neural_network), 0, 0) = i;
-            MAT_AT(NN_INPUT(our_neural_network), 0, 1) = j;
-            nn_forward(our_neural_network);
-            printf("%u ^ %u = %lf\n", i, j, MAT_AT(NN_OUTPUT(our_neural_network), 0, 0));
+            MAT_AT(NN_INPUT(network), 0, 0) = i;
+            MAT_AT(NN_INPUT(network), 0, 1) = j;
+            nn_forward(network);
+            printf("%u ^ %u = %lf\n", i, j, MAT_AT(NN_OUTPUT(network), 0, 0));
         }
     }
 

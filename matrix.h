@@ -49,6 +49,7 @@ void mat_rand(Mat m, double low, double high);
 void mat_sig(Mat m);
 Mat mat_row(Mat m, size_t row);
 void mat_copy(Mat dst, Mat src);
+void mat_fill(Mat m, double x);
 
 // ---------------------------------------------------------------------------------
 
@@ -59,6 +60,13 @@ void nn_forward(Network nn);
 double nn_cost(Network nn, Mat ti, Mat to);
 void nn_finite_diff(Network m, Network g, double eps, Mat ti, Mat to);
 void nn_learn(Network nn, Network g, double rate);
+
+// ---------------------------------------------------------------------------------
+
+void nn_backprop(Network nn, Network g, Mat ti, Mat to);
+void nn_zero(Network nn);
+
+
 
 #define NN_PRINT(nn)    nn_print(nn, #nn)
 #define MAT_PRINT(mat)  mat_print(mat, #mat, 0)

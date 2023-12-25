@@ -4,7 +4,7 @@
 #include "xor.h"
 
 // 2 inputs, 2 hidden layers with 4 and 2 neurons respectively, and one output layer with 1 neuron
-// size_t arch[] = {2, 2, 1};
+// size_t arch[] = {2, 4, 2, 1};
 // Network nn = nn_alloc(arch, ARRAY_LEN(layers));
 
 Network nn_alloc(size_t *arch, size_t arch_count){
@@ -139,6 +139,80 @@ void nn_learn(Network nn, Network g, double rate){
     }
 }
 
+void nn_backprop(Network nn, Network g, Mat ti, Mat to){
+    MATRIX_ASSERT(ti.rows == to.rows);
+    size_t n = ti.rows;
+    MATRIX_ASSERT(NN_OUTPUT(nn).cols == to.cols);
+
+    nn_zero(g);
+    // i     --> current sample
+    // layer --> current layer
+    // j     --> current activation
+    // k     --> previous activation
+
+    for(size_t i = 0; i < n; ++i){
+        mat_copy(NN_INPUT(nn), mat_row(ti, i));
+        nn_forward(nn);
+
+        for(size_t j = 0; j <= nn.count; ++j){
+            mat_fill(g.as[j], 0);
+        }
+
+        for(size_t j = 0; j < to.cols; ++j){
+            MAT_AT(NN_OUTPUT(g), 0, j) = MAT_AT(NN_OUTPUT(nn), 0, j) - MAT_AT(to, i, j);
+        }
+
+        for(size_t layer = nn.count; layer > 0; --layer){
+            for(size_t j = 0; j < nn.as[layer].cols; ++j){
+                double a = MAT_AT(nn.as[layer], 0, j);
+                double da = MAT_AT(g.as[layer], 0, j);
+                MAT_AT(g.bs[layer - 1], 0, j) += 2*da*a*(1 - a); // partial derivative for biases
+
+                for(size_t k = 0; k < nn.as[layer - 1].cols; ++k){
+                    // j --> weight matrix column
+                    // k --> weight matrix row
+                    double pa = MAT_AT(nn.as[layer - 1], 0, k);
+                    double w  = MAT_AT(nn.ws[layer - 1], k, j); 
+                    MAT_AT(g.ws[layer - 1], k, j) += 2*da*a*(1 - a)*pa; // partial derivative for weights 
+                    MAT_AT(g.as[layer - 1], 0, k) += 2*da*a*(1 - a)*w;
+                }
+            }
+        }
+    }
+
+    for(size_t i = 0; i < g.count; ++i){
+
+        for(size_t j = 0; j < g.ws[i].rows; ++j){
+            for(size_t k = 0; k < g.ws[i].cols; ++k){
+                MAT_AT(g.ws[i], j, k) /= n;
+            }
+        }
+
+        for(size_t j = 0; j < g.bs[i].rows; ++j){
+            for(size_t k = 0; k < g.bs[i].cols; ++k){
+                MAT_AT(g.bs[i], j, k) /= n;
+            }
+        }
+    }
+}
+
+void nn_zero(Network nn){
+    for(size_t i = 0; i < nn.count; ++i){
+        mat_fill(nn.ws[i], 0);
+        mat_fill(nn.bs[i], 0);
+        mat_fill(nn.as[i], 0);
+    }
+    mat_fill(nn.as[nn.count], 0);
+}
+
+
+void mat_fill(Mat m, double x){
+    for(size_t i = 0; i < m.rows; ++i){
+        for(size_t j = 0; j < m.cols; ++j){
+            MAT_AT(m, i, j) = x;
+        }
+    }
+}
 
 Mat mat_alloc(size_t rows, size_t cols){
     Mat m;
