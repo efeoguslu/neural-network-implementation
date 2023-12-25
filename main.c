@@ -4,9 +4,10 @@
 #include "matrix.h"
 #include <time.h>
 
-// ML3 --> 3.14.00
+// ML3 --> 3.25.00
 
 // training data:
+
 double td[] = {
     0, 0, 0,
     0, 1, 1,
@@ -15,12 +16,9 @@ double td[] = {
 };
 
 int main(){
-
-    clock_t start, end;
-    start = clock();
-
+    
     randomize();
-
+    
     size_t stride = 3;
     size_t n = sizeof(td)/sizeof(td[0])/stride;
 
@@ -60,6 +58,9 @@ int main(){
     size_t epoch = 50000;
     nn_rand(network, 0, 1);
 
+    clock_t start, end;
+    start = clock();
+
     printf("cost = %lf\n", nn_cost(network, ti, to));
 
     for(size_t i = 0; i < epoch; ++i){
@@ -75,6 +76,14 @@ int main(){
         fprintf(fp, "%lf\n", nn_cost(network, ti, to));
     }
 
+    end = clock();
+
+    dline();
+    NN_PRINT(gradient);
+    dline();
+    NN_PRINT(network);
+    dline();
+
     fclose(fp);
 
     printf("\nTest:\n");
@@ -87,9 +96,9 @@ int main(){
         }
     }
 
-    end = clock();
+    
     double dblTime = ((double)(end - start)) / CLOCKS_PER_SEC;
-
+    dline();
     printf("\n%lf seconds have passed.\n", dblTime);
 
     return 0;
