@@ -5,6 +5,9 @@
 #include "mnist.h"
 #include <time.h>
 #include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -19,11 +22,16 @@ double td[] = {
     1, 1, 0,
 };
 
+const char *out_directory = "/home/efeog/Desktop/mnist-matrix";
+const char *out_file_name = "img.mat";
+
+const char *img_file_path = "/home/efeog/Desktop/number_image/281.png";
 
 int main(int argc, char **argv){
 
     const char *program = args_shift(&argc, &argv);
 
+    /*
     if(argc <= 0){
         fprintf(stderr, "Usage: %s <input>\n", program);
         fprintf(stderr, "ERROR: no input file provided\n");
@@ -31,6 +39,12 @@ int main(int argc, char **argv){
     }
 
     const char *img_file_path = args_shift(&argc, &argv);
+    */
+
+    if(mkdir(out_directory, 0777) == -1 && errno != EEXIST) {
+        perror("Error creating directory");
+        return 1;
+    }
 
     int img_width, img_height, img_comp;
     uint8_t *img_pixels = (uint8_t *)stbi_load(img_file_path, &img_width, &img_height, &img_comp, 0);
@@ -63,7 +77,8 @@ int main(int argc, char **argv){
 
     MAT_PRINT(t);
 
-    const char *out_file_path = "img.mat";
+    char out_file_path[256];
+    snprintf(out_file_path, sizeof(out_file_path), "%s/%s", out_directory, out_file_name);
     FILE *out = fopen(out_file_path, "wb");
 
     if(out == NULL){
@@ -75,6 +90,8 @@ int main(int argc, char **argv){
     fclose(out);
 
     printf("Generated %s from %s\n", out_file_path, img_file_path);
+
+    cool_terminal_print(img_height, img_width, img_pixels);
 
     // ---------------------------------------------------------------------------------------------
     return 0;
@@ -153,7 +170,7 @@ int main(int argc, char **argv){
             MAT_AT(NN_INPUT(network), 0, 0) = i;
             MAT_AT(NN_INPUT(network), 0, 1) = j;
             nn_forward(network);
-            printf("%u ^ %u = %lf\n", i, j, MAT_AT(NN_OUTPUT(network), 0, 0));
+            printf("%lu ^ %lu = %lf\n", i, j, MAT_AT(NN_OUTPUT(network), 0, 0));
         }
     }
 

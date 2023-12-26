@@ -242,7 +242,7 @@ void test_xor_model(Xor m){
     printf("\nTest for XOR model:\n");
     for(size_t i = 0; i < 2; ++i){
         for(size_t j = 0; j < 2; ++j){
-            printf("%u ^ %u = %lf\n", i, j, forward(m, i, j));
+            printf("%lu ^ %lu = %lf\n", i, j, forward(m, i, j));
         }
     }
 }

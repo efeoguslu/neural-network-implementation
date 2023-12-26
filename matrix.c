@@ -41,9 +41,9 @@ void nn_print(Network nn, const char* name){
     printf("%s = [\n", name);
 
     for(size_t i = 0; i < nn.count; ++i){
-        snprintf(buf, sizeof(buf), "ws%u", i);
+        snprintf(buf, sizeof(buf), "ws%lu", i);
         mat_print(nn.ws[i], buf, 4);
-        snprintf(buf, sizeof(buf), "bs%u", i);
+        snprintf(buf, sizeof(buf), "bs%lu", i);
         mat_print(nn.bs[i], buf, 4);
     }
 

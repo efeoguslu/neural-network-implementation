@@ -2,6 +2,7 @@
 #include "activation.h"
 #include "xor.h"
 #include "matrix.h"
+#include <stdint.h>
 
 void randomize(void){
     srand((unsigned int)time(0));
@@ -62,7 +63,7 @@ void test_model(double w1, double w2, double bias){
     printf("\nTest:\n");
     for(size_t i = 0; i < 2; ++i){
         for(size_t j = 0; j < 2; ++j){
-            printf("%u | %u = %lf\n", i, j, sigmoid(i*w1 + j*w2 + bias));
+            printf("%lu | %lu = %lf\n", i, j, sigmoid(i*w1 + j*w2 + bias));
         }
     }
 }
@@ -81,3 +82,13 @@ char *args_shift(int *argc, char ***argv){
     return result;
 }
 
+void cool_terminal_print(int img_height, int img_width, uint8_t *img_pixels){
+        for(int y = 0; y < img_height; ++y){
+        for(int x = 0; x < img_width; ++x){
+            double nx = (double)x/(img_width - 1);
+            double ny = (double)y/(img_height - 1);
+            printf("%3u ", img_pixels[y*img_width + x]);
+        }
+        printf("\n");
+    }
+}
