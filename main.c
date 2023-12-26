@@ -15,12 +15,14 @@
 
 // upscale --> 43.06
 
+/*
 double td[] = {
     0, 0, 0,
     0, 1, 1,
     1, 0, 1,
     1, 1, 0,
 };
+*/
 
 const char *out_directory = "/home/efeog/Desktop/mnist-matrix";
 const char *out_file_name = "img.mat";
@@ -75,7 +77,26 @@ int main(int argc, char **argv){
         }
     }
 
-    MAT_PRINT(t);
+    Mat ti = {
+        .rows = t.rows,
+        .cols = 2,
+        .stride = t.stride,
+        .es = &MAT_AT(t, 0, 0),
+    };
+
+    Mat to = {
+        .rows = t.rows,
+        .cols = 1,
+        .stride = t.stride,
+        .es = &MAT_AT(t, 0, ti.cols),
+    };
+
+    MAT_PRINT(ti);
+    MAT_PRINT(to);
+
+    // return 0;
+
+    /*/
 
     char out_file_path[256];
     snprintf(out_file_path, sizeof(out_file_path), "%s/%s", out_directory, out_file_name);
@@ -91,10 +112,51 @@ int main(int argc, char **argv){
 
     printf("Generated %s from %s\n", out_file_path, img_file_path);
 
+    // cool_terminal_print(img_height, img_width, img_pixels);
+    */
+
+    size_t arch[] = {2, 28, 28, 1};
+    Network nn = nn_alloc(arch, ARRAY_LEN(arch));
+    Network g = nn_alloc(arch, ARRAY_LEN(arch));
+    nn_rand(nn, -1, 1);
+
+    double rate = 2.0;
+
+
+    size_t epoch = 50000;
+
+    for(size_t i = 0; i < epoch; ++i){
+        nn_backprop(nn, g, ti, to);
+        nn_learn(nn, g, rate);
+        if(i % 100 == 0) printf("%zu: cost = %lf\n", i, nn_cost(nn, ti, to));
+    }
+
     cool_terminal_print(img_height, img_width, img_pixels);
 
-    // ---------------------------------------------------------------------------------------------
+    for(size_t y = 0; y < (size_t)img_height; ++y){
+        for(size_t x = 0; x < (size_t)img_width; ++x){
+            MAT_AT(NN_INPUT(nn), 0, 0) = (double)x/(img_width - 1);
+            MAT_AT(NN_INPUT(nn), 0, 1) = (double)y/(img_height - 1);
+            nn_forward(nn);
+            uint8_t pixel = MAT_AT(NN_OUTPUT(nn), 0, 0)*255.0;
+            printf("%3u ", pixel);
+        }
+        printf("\n");
+    }
+
+
+
+
+
+
+
+
     return 0;
+}
+
+    // ---------------------------------------------------------------------------------------------
+
+    /*
 
     randomize();
     
@@ -181,3 +243,4 @@ int main(int argc, char **argv){
 
     return 0;
 }
+*/
