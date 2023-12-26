@@ -50,7 +50,7 @@ void mat_sig(Mat m);
 Mat mat_row(Mat m, size_t row);
 void mat_copy(Mat dst, Mat src);
 void mat_fill(Mat m, double x);
-
+void mat_save(FILE *file, Mat m);
 // ---------------------------------------------------------------------------------
 
 Network nn_alloc(size_t *arch, size_t arch_count);

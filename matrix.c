@@ -306,4 +306,13 @@ void mat_sig(Mat m){
     }
 }
 
+void mat_save(FILE *file, Mat m) {
+    fprintf(file, "%zu %zu\n", m.rows, m.cols);
 
+    for (size_t i = 0; i < m.rows; ++i) {
+        for (size_t j = 0; j < m.cols; ++j) {
+            fprintf(file, "%lf ", MAT_AT(m, i, j));
+        }
+        fprintf(file, "\n");
+    }
+}

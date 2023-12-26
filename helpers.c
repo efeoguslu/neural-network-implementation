@@ -1,6 +1,7 @@
 #include "helpers.h"
 #include "activation.h"
 #include "xor.h"
+#include "matrix.h"
 
 void randomize(void){
     srand((unsigned int)time(0));
@@ -70,5 +71,13 @@ void test_model(double w1, double w2, double bias){
 double rand_double(void) 
 {
     return (double)rand() / (double)RAND_MAX;
+}
+
+char *args_shift(int *argc, char ***argv){
+    assert(*argc > 0);
+    char *result = **argv;
+    (*argc) -= 1;
+    (*argv) += 1;
+    return result;
 }
 

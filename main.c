@@ -10,7 +10,7 @@
 
 // training data:
 
-// 41.03
+// upscale --> 43.06
 
 double td[] = {
     0, 0, 0,
@@ -19,13 +19,6 @@ double td[] = {
     1, 1, 0,
 };
 
-char *args_shift(int *argc, char ***argv){
-    assert(*argc > 0);
-    char *result = **argv;
-    (*argc) -= 1;
-    (*argv) += 1;
-    return result;
-}
 
 int main(int argc, char **argv){
 
@@ -72,7 +65,16 @@ int main(int argc, char **argv){
 
     const char *out_file_path = "img.mat";
     FILE *out = fopen(out_file_path, "wb");
-    // void mat_save(FILE *out, Mat m);
+
+    if(out == NULL){
+        fprintf(stderr, "ERROR: could not open file %s\n", out_file_path);
+        return 1;
+    }
+
+    mat_save(out, t);
+    fclose(out);
+
+    printf("Generated %s from %s\n", out_file_path, img_file_path);
 
     // ---------------------------------------------------------------------------------------------
     return 0;
@@ -158,7 +160,7 @@ int main(int argc, char **argv){
     
     double dblTime = ((double)(end - start)) / CLOCKS_PER_SEC;
     dline();
-    printf("\n%lf seconds have passed.\n", dblTime);
+    printf("\n%lf seconds have elapsed during the training process.\n", dblTime);
 
     return 0;
 }

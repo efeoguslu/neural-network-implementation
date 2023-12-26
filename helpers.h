@@ -14,5 +14,8 @@ void menu(int* num_layers, int** neurons_per_layer, ActivationFunction* activati
 void test_model(double w1, double w2, double b);
 double rand_double(void);
 
+
+char *args_shift(int *argc, char ***argv);
+
 #endif
 
