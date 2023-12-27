@@ -9,7 +9,7 @@ void randomize(void){
 }
 
 void dline(void){
-    printf("----------------------------------------------------------------\n");
+    printf("--------------------------------------------------------------------------------------------------------------------------------\n");
 }
 
 void menu(int* num_layers, int** neurons_per_layer, ActivationFunction* activation_func) {

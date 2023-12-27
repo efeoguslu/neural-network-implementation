@@ -10,38 +10,21 @@
 #include <errno.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
-// training data:
-
-// upscale --> 43.06
-
-/*
-double td[] = {
-    0, 0, 0,
-    0, 1, 1,
-    1, 0, 1,
-    1, 1, 0,
-};
-*/
 
 const char *out_directory = "/home/efeog/Desktop/mnist-matrix";
 const char *out_file_name = "img.mat";
 
 const char *img_file_path = "/home/efeog/Desktop/number_image/281.png";
 
+const char *output_directory = "/home/efeog/Desktop/final_image_output";
+const char *output_image_name = "output.png";
+
 int main(int argc, char **argv){
 
     const char *program = args_shift(&argc, &argv);
-
-    /*
-    if(argc <= 0){
-        fprintf(stderr, "Usage: %s <input>\n", program);
-        fprintf(stderr, "ERROR: no input file provided\n");
-        return 1;
-    }
-
-    const char *img_file_path = args_shift(&argc, &argv);
-    */
 
     if(mkdir(out_directory, 0777) == -1 && errno != EEXIST) {
         perror("Error creating directory");
@@ -94,45 +77,51 @@ int main(int argc, char **argv){
     MAT_PRINT(ti);
     MAT_PRINT(to);
 
-    // return 0;
-
-    /*/
-
-    char out_file_path[256];
-    snprintf(out_file_path, sizeof(out_file_path), "%s/%s", out_directory, out_file_name);
-    FILE *out = fopen(out_file_path, "wb");
-
-    if(out == NULL){
-        fprintf(stderr, "ERROR: could not open file %s\n", out_file_path);
-        return 1;
-    }
-
-    mat_save(out, t);
-    fclose(out);
-
-    printf("Generated %s from %s\n", out_file_path, img_file_path);
-
-    // cool_terminal_print(img_height, img_width, img_pixels);
-    */
-
-    size_t arch[] = {2, 28, 28, 1};
+    size_t arch[] = {2, 28, 28, 16, 1};
     Network nn = nn_alloc(arch, ARRAY_LEN(arch));
     Network g = nn_alloc(arch, ARRAY_LEN(arch));
     nn_rand(nn, -1, 1);
 
-    double rate = 2.0;
-
-
+    double rate = 2.5;
     size_t epoch = 50000;
+    clock_t start, end;
+    start = clock();
 
     for(size_t i = 0; i < epoch; ++i){
         nn_backprop(nn, g, ti, to);
         nn_learn(nn, g, rate);
-        if(i % 100 == 0) printf("%zu: cost = %lf\n", i, nn_cost(nn, ti, to));
+        if(i % 100 == 0){
+            printf("epoch: %zu\t cost = %lf\tlearning rate = %.1lf\t\n", i, nn_cost(nn, ti, to), rate);
+            printf("Enhanced Training Matrix at Epoch %zu: \n", i);
+            dline();
+            for(size_t y = 0; y < (size_t)img_height; ++y){
+                for(size_t x = 0; x < (size_t)img_width; ++x){
+                    MAT_AT(NN_INPUT(nn), 0, 0) = (double)x/(img_width - 1);
+                    MAT_AT(NN_INPUT(nn), 0, 1) = (double)y/(img_height - 1);
+                    nn_forward(nn);
+                    uint8_t pixel = MAT_AT(NN_OUTPUT(nn), 0, 0)*255.0;
+
+                    if(pixel != 0) printf("%3u ", pixel);
+                    else printf("    ");
+
+                }
+                printf("\n");
+            }
+
+        }
     }
 
-    cool_terminal_print(img_height, img_width, img_pixels);
+    end = clock();
 
+
+
+    dline();
+    printf("Original Image Matrix:\n");
+    dline();
+    cool_terminal_print(img_height, img_width, img_pixels);
+    dline();
+    printf("Enhanced Training Matrix: \n");
+    dline();
     for(size_t y = 0; y < (size_t)img_height; ++y){
         for(size_t x = 0; x < (size_t)img_width; ++x){
             MAT_AT(NN_INPUT(nn), 0, 0) = (double)x/(img_width - 1);
@@ -144,103 +133,48 @@ int main(int argc, char **argv){
         printf("\n");
     }
 
-
-
-
-
-
-
-
-    return 0;
-}
-
-    // ---------------------------------------------------------------------------------------------
-
-    /*
-
-    randomize();
-    
-    size_t stride = 3;
-    size_t n = sizeof(td)/sizeof(td[0])/stride;
-
-    Mat ti = {
-        .rows = n,
-        .cols = 2,
-        .stride = stride,
-        .es = td
-    };
-
-    Mat to = {
-        .rows = n,
-        .cols = 1,
-        .stride = stride,
-        .es = td + 2,
-    }; 
-
-    size_t arch[] = {2, 2, 1};
-    
-    // memory management:
-
-    Network network = nn_alloc(arch, ARRAY_LEN(arch));
-    Network gradient = nn_alloc(arch, ARRAY_LEN(arch));
-
-
-    FILE *fp;  // File pointer
-    fp = fopen("cost.txt", "w");  // Open file in write mode
-
-    if (fp == NULL) {
-        fprintf(stderr, "Error opening file\n");
+    if(mkdir(output_directory, 0777) == -1 && errno != EEXIST){
+        perror("Error creating output image directory");
         return 1;
     }
 
-    // double eps = 1e-1;
-    double rate = 1e-1;
-    size_t epoch = 50000;
-    nn_rand(network, 0, 1);
+    char output_image_path[256];
+    snprintf(output_image_path, sizeof(output_image_path), "%s/%s", output_directory, output_image_name);
 
-    clock_t start, end;
-    start = clock();
-
-    printf("cost = %lf\n", nn_cost(network, ti, to));
-
-    for(size_t i = 0; i < epoch; ++i){
-#if 0
-        double eps = 1e-1;
-        nn_finite_diff(network, gradient, eps, ti, to);
-#else
-        nn_backprop(network, gradient, ti, to);
-#endif
-        //NN_PRINT(gradient);
-        nn_learn(network, gradient, rate);
-        printf("cost = %lf\n", nn_cost(network, ti, to));
-        fprintf(fp, "%lf\n", nn_cost(network, ti, to));
+    FILE *output_image = fopen(output_image_path, "wb");
+    if (output_image == NULL) {
+        fprintf(stderr, "ERROR: could not open file %s\n", output_image_path);
+        return 1;
     }
 
-    end = clock();
+    uint8_t *output_pixels = (uint8_t *)malloc(img_width * img_height);
 
-    dline();
-    NN_PRINT(gradient);
-    dline();
-    NN_PRINT(network);
-    dline();
-
-    fclose(fp);
-
-    printf("\nTest:\n");
-    for(size_t i = 0; i < 2; ++i){
-        for(size_t j = 0; j < 2; ++j){
-            MAT_AT(NN_INPUT(network), 0, 0) = i;
-            MAT_AT(NN_INPUT(network), 0, 1) = j;
-            nn_forward(network);
-            printf("%lu ^ %lu = %lf\n", i, j, MAT_AT(NN_OUTPUT(network), 0, 0));
+    for (size_t y = 0; y < (size_t)img_height; ++y) {
+        for (size_t x = 0; x < (size_t)img_width; ++x) {
+            MAT_AT(NN_INPUT(nn), 0, 0) = (double)x / (img_width - 1);
+            MAT_AT(NN_INPUT(nn), 0, 1) = (double)y / (img_height - 1);
+            nn_forward(nn);
+            uint8_t pixel = MAT_AT(NN_OUTPUT(nn), 0, 0) * 255.0;
+            output_pixels[y * img_width + x] = pixel;
         }
     }
 
-    
+    if (stbi_write_png(output_image_path, img_width, img_height, 1, output_pixels, img_width) == 0) {
+        fprintf(stderr, "ERROR: could not write PNG file %s\n", output_image_path);
+        fclose(output_image);
+        free(output_pixels);
+        return 1;
+    }      
+
+    fclose(output_image);
+    free(output_pixels);
+
+    printf("Generated %s from trained matrix\n", output_image_path);
+
     double dblTime = ((double)(end - start)) / CLOCKS_PER_SEC;
     dline();
     printf("\n%lf seconds have elapsed during the training process.\n", dblTime);
 
     return 0;
 }
-*/
+
