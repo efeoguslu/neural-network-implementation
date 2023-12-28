@@ -13,10 +13,6 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-
-const char *out_directory = "/home/efeog/Desktop/mnist-matrix";
-const char *out_file_name = "img.mat";
-
 const char *img_file_path = "/home/efeog/Desktop/number_image/281.png";
 
 const char *output_directory = "/home/efeog/Desktop/final_image_output";
@@ -24,14 +20,10 @@ const char *output_image_name = "output.png";
 
 int main(int argc, char **argv){
 
-    const char *program = args_shift(&argc, &argv);
+    // const char *program = args_shift(&argc, &argv);
 
-    if(mkdir(out_directory, 0777) == -1 && errno != EEXIST) {
-        perror("Error creating directory");
-        return 1;
-    }
+    int img_width = 0, img_height = 0, img_comp = 0;
 
-    int img_width, img_height, img_comp;
     uint8_t *img_pixels = (uint8_t *)stbi_load(img_file_path, &img_width, &img_height, &img_comp, 0);
 
     if(img_pixels == NULL){
@@ -83,27 +75,27 @@ int main(int argc, char **argv){
     nn_rand(nn, -1, 1);
 
     double rate = 2.5;
-    size_t epoch = 50000;
+    size_t epoch = 5000;
     clock_t start, end;
     start = clock();
 
     for(size_t i = 0; i < epoch; ++i){
+
         nn_backprop(nn, g, ti, to);
         nn_learn(nn, g, rate);
+
         if(i % 100 == 0){
             printf("epoch: %zu\t cost = %lf\tlearning rate = %.1lf\t\n", i, nn_cost(nn, ti, to), rate);
             printf("Enhanced Training Matrix at Epoch %zu: \n", i);
             dline();
+
             for(size_t y = 0; y < (size_t)img_height; ++y){
                 for(size_t x = 0; x < (size_t)img_width; ++x){
                     MAT_AT(NN_INPUT(nn), 0, 0) = (double)x/(img_width - 1);
                     MAT_AT(NN_INPUT(nn), 0, 1) = (double)y/(img_height - 1);
                     nn_forward(nn);
                     uint8_t pixel = MAT_AT(NN_OUTPUT(nn), 0, 0)*255.0;
-
-                    if(pixel != 0) printf("%3u ", pixel);
-                    else printf("    ");
-
+                    print_to_terminal(pixel);
                 }
                 printf("\n");
             }

@@ -1,5 +1,6 @@
 #include "mnist.h"
 
+/*
 // Function to load MNIST data
 double** load_mnist_data(const char* image_file, const char* label_file, int num_images) {
     FILE* fp_images = fopen(image_file, "rb");
@@ -47,3 +48,6 @@ void preprocess_data(double** data, int num_images) {
         }
     }
 }
+
+
+*/

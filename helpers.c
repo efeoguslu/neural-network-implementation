@@ -2,7 +2,7 @@
 #include "activation.h"
 #include "xor.h"
 #include "matrix.h"
-#include <stdint.h>
+
 
 void randomize(void){
     srand((unsigned int)time(0));
@@ -12,6 +12,7 @@ void dline(void){
     printf("--------------------------------------------------------------------------------------------------------------------------------\n");
 }
 
+/*
 void menu(int* num_layers, int** neurons_per_layer, ActivationFunction* activation_func) {
     printf("\nWelcome to the Neural Network Implementation Project in C!\n");
     printf("\nPlease enter the number of layers: ");
@@ -57,6 +58,8 @@ void menu(int* num_layers, int** neurons_per_layer, ActivationFunction* activati
     fclose(params_file);
 }
 
+
+*/
 // -----------------------------------------------------------------------------------------------
 
 void test_model(double w1, double w2, double bias){
@@ -83,7 +86,7 @@ char *args_shift(int *argc, char ***argv){
 }
 
 void cool_terminal_print(int img_height, int img_width, uint8_t *img_pixels){
-        for(int y = 0; y < img_height; ++y){
+    for(int y = 0; y < img_height; ++y){
         for(int x = 0; x < img_width; ++x){
             double nx = (double)x/(img_width - 1);
             double ny = (double)y/(img_height - 1);
@@ -91,4 +94,9 @@ void cool_terminal_print(int img_height, int img_width, uint8_t *img_pixels){
         }
         printf("\n");
     }
+}
+
+void print_to_terminal(uint8_t pixel){
+    if(pixel != 0) printf("%3u ", pixel);
+    else printf("    ");
 }
