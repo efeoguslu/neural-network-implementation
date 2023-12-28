@@ -90,7 +90,8 @@ void cool_terminal_print(int img_height, int img_width, uint8_t *img_pixels){
         for(int x = 0; x < img_width; ++x){
             double nx = (double)x/(img_width - 1);
             double ny = (double)y/(img_height - 1);
-            printf("%3u ", img_pixels[y*img_width + x]);
+            if(img_pixels[y*img_width + x] != 0) printf("%3u ", img_pixels[y*img_width + x]);
+            else printf("    ");
         }
         printf("\n");
     }

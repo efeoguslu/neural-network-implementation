@@ -17,13 +17,11 @@ const char *img_file_path = "/home/efeog/Desktop/number_image/281.png";
 
 const char *output_directory = "/home/efeog/Desktop/final_image_output";
 const char *output_image_name = "output.png";
+const char *output_cost_file_name = "cost.txt"; 
 
 int main(int argc, char **argv){
 
-    // const char *program = args_shift(&argc, &argv);
-
     int img_width = 0, img_height = 0, img_comp = 0;
-
     uint8_t *img_pixels = (uint8_t *)stbi_load(img_file_path, &img_width, &img_height, &img_comp, 0);
 
     if(img_pixels == NULL){
@@ -43,12 +41,9 @@ int main(int argc, char **argv){
     for(int y = 0; y < img_height; ++y){
         for(int x = 0; x < img_width; ++x){
             size_t i = y*img_width + x;
-            double nx = (double)x/(img_width - 1);
-            double ny = (double)y/(img_height - 1);
-            double nb = img_pixels[i]/255.0;
-            MAT_AT(t, i, 0) = nx;
-            MAT_AT(t, i, 1) = ny;
-            MAT_AT(t, i, 2) = nb;
+            MAT_AT(t, i, 0) = (double)x/(img_width - 1);
+            MAT_AT(t, i, 1) = (double)y/(img_height - 1);
+            MAT_AT(t, i, 2) = img_pixels[i]/255.0;
         }
     }
 
@@ -75,17 +70,29 @@ int main(int argc, char **argv){
     nn_rand(nn, -1, 1);
 
     double rate = 2.5;
-    size_t epoch = 5000;
+    size_t epoch = 50000;
+
     clock_t start, end;
     start = clock();
+
+    FILE *cost_file = fopen(output_cost_file_name, "w"); 
+
+    if (cost_file == NULL) {
+        fprintf(stderr, "ERROR: could not open file %s for writing\n", output_cost_file_name);
+        return 1;
+    }
 
     for(size_t i = 0; i < epoch; ++i){
 
         nn_backprop(nn, g, ti, to);
         nn_learn(nn, g, rate);
 
+        // fprintf(cost_file, "%lf\n", nn_cost(nn, ti, to));
+
         if(i % 100 == 0){
+            dline();
             printf("epoch: %zu\t cost = %lf\tlearning rate = %.1lf\t\n", i, nn_cost(nn, ti, to), rate);
+            dline();
             printf("Enhanced Training Matrix at Epoch %zu: \n", i);
             dline();
 
@@ -105,6 +112,7 @@ int main(int argc, char **argv){
 
     end = clock();
 
+    fclose(cost_file);
 
 
     dline();
@@ -114,13 +122,14 @@ int main(int argc, char **argv){
     dline();
     printf("Enhanced Training Matrix: \n");
     dline();
+
     for(size_t y = 0; y < (size_t)img_height; ++y){
         for(size_t x = 0; x < (size_t)img_width; ++x){
             MAT_AT(NN_INPUT(nn), 0, 0) = (double)x/(img_width - 1);
             MAT_AT(NN_INPUT(nn), 0, 1) = (double)y/(img_height - 1);
             nn_forward(nn);
             uint8_t pixel = MAT_AT(NN_OUTPUT(nn), 0, 0)*255.0;
-            printf("%3u ", pixel);
+            print_to_terminal(pixel);
         }
         printf("\n");
     }
@@ -160,7 +169,7 @@ int main(int argc, char **argv){
 
     fclose(output_image);
     free(output_pixels);
-
+    dline();
     printf("Generated %s from trained matrix\n", output_image_path);
 
     double dblTime = ((double)(end - start)) / CLOCKS_PER_SEC;
