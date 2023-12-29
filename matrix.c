@@ -316,3 +316,7 @@ void mat_save(FILE *file, Mat m) {
         fprintf(file, "\n");
     }
 }
+
+void mat_free(Mat m) {
+    free(m.es);
+}
