@@ -12,11 +12,11 @@
 #include "stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
-
+ 
 const char *img_file_path = "/home/efeog/Desktop/number_image/281.png";
 
 const char *output_directory = "/home/efeog/Desktop/final_image_output";
-const char *output_image_name = "output.png";
+//const char *output_image_name = "output.png";
 const char *output_cost_file_name = "cost.txt"; 
 
 int main(int argc, char **argv){
@@ -64,7 +64,7 @@ int main(int argc, char **argv){
     MAT_PRINT(ti);
     MAT_PRINT(to);
 
-    size_t arch[] = {2, 28, 28, 16, 1};
+    size_t arch[] = {2, 28, 28, 1};
     Network nn = nn_alloc(arch, ARRAY_LEN(arch));
     Network g = nn_alloc(arch, ARRAY_LEN(arch));
     nn_rand(nn, -1, 1);
@@ -113,6 +113,10 @@ int main(int argc, char **argv){
     end = clock();
 
     fclose(cost_file);
+
+    char output_image_name[256];
+    snprintf(output_image_name, sizeof(output_image_name), "%zu-%zu-%zu-%zu_%.1lf_%zu_output.png",
+         arch[0], arch[1], arch[2], arch[3], rate, epoch);
 
 
     dline();
