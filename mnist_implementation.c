@@ -64,13 +64,13 @@ int main(int argc, char **argv){
     MAT_PRINT(ti);
     MAT_PRINT(to);
 
-    size_t arch[] = {2, 28, 28, 1};
+    size_t arch[] = {2, 16, 16, 1};
     Network nn = nn_alloc(arch, ARRAY_LEN(arch));
     Network g = nn_alloc(arch, ARRAY_LEN(arch));
     nn_rand(nn, -1, 1);
 
     double rate = 2.5;
-    size_t epoch = 50000;
+    size_t epoch = 10000;
 
     clock_t start, end;
     start = clock();
@@ -87,8 +87,9 @@ int main(int argc, char **argv){
         nn_backprop(nn, g, ti, to);
         nn_learn(nn, g, rate);
 
-        // fprintf(cost_file, "%lf\n", nn_cost(nn, ti, to));
+        fprintf(cost_file, "%lf\n", nn_cost(nn, ti, to));
 
+        /*
         if(i % 100 == 0){
             dline();
             printf("epoch: %zu\t cost = %lf\tlearning rate = %.1lf\t\n", i, nn_cost(nn, ti, to), rate);
@@ -108,6 +109,7 @@ int main(int argc, char **argv){
             }
 
         }
+        */
     }
 
     end = clock();
