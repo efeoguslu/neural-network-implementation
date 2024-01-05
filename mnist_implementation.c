@@ -70,7 +70,7 @@ int main(int argc, char **argv){
     nn_rand(nn, -1, 1);
 
     double rate = 2.5;
-    size_t epoch = 10000;
+    size_t epoch = 25000;
 
     clock_t start, end;
     start = clock();
@@ -87,14 +87,14 @@ int main(int argc, char **argv){
         nn_backprop(nn, g, ti, to);
         nn_learn(nn, g, rate);
 
-        fprintf(cost_file, "%lf\n", nn_cost(nn, ti, to));
+        //fprintf(cost_file, "%lf\n", nn_cost(nn, ti, to));
 
-        /*
+        
         if(i % 100 == 0){
             dline();
             printf("epoch: %zu\t cost = %lf\tlearning rate = %.1lf\t\n", i, nn_cost(nn, ti, to), rate);
             dline();
-            printf("Enhanced Training Matrix at Epoch %zu: \n", i);
+            printf("Trained Image Matrix at Epoch %zu: \n", i);
             dline();
 
             for(size_t y = 0; y < (size_t)img_height; ++y){
@@ -109,7 +109,7 @@ int main(int argc, char **argv){
             }
 
         }
-        */
+        
     }
 
     end = clock();
