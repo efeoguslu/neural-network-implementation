@@ -1,0 +1,19 @@
+# ninja log v5
+0	398	1698262264249275201	CMakeFiles/neural_network_implementation.dir/activation.c.o	6b87c67d19a92ca3
+137	262	1698316853709410822	neural_network_implementation	3876d9a66352618f
+1	137	1698316853586840733	CMakeFiles/neural_network_implementation.dir/main.c.o	20839cf05b33b2e6
+1	401	1698262264251524810	CMakeFiles/neural_network_implementation.dir/helpers.c.o	61bd5f431ea74295
+5	109	1698328413300289782	CMakeFiles/neural_network_implementation.dir/tests/multiplier.c.o	189d7c0c7a733e06
+109	208	1698328413400780180	CMakeFiles/neural_network_implementation.dir/tests/orGate.c.o	fa3af1bfb5ddc00a
+2	748	1698328413939276767	CMakeFiles/neural_network_implementation.dir/mainProject/activation.c.o	c4b3887ca3a45ea4
+4	749	1698328413939242952	CMakeFiles/neural_network_implementation.dir/mainProject/helpers.c.o	1c567a54518f711d
+209	753	1698328413942719527	CMakeFiles/neural_network_implementation.dir/main.c.o	ba6890252a0d281f
+754	905	1698328414094288694	neural_network_implementation	d16b1a266fcba6f3
+4	931	1698330881257175493	CMakeFiles/neural_network_implementation.dir/tests/orGate.c.o	fa3af1bfb5ddc00a
+2	143	1698330997476180812	CMakeFiles/neural_network_implementation.dir/main.c.o	ba6890252a0d281f
+4	171	1698331020977659255	CMakeFiles/neural_network_implementation.dir/main.c.o	ba6890252a0d281f
+1	131	1698331154422010502	CMakeFiles/neural_network_implementation.dir/tests/orGate.c.o	fa3af1bfb5ddc00a
+2	148	1698331183595882705	CMakeFiles/neural_network_implementation.dir/tests/orGate.c.o	fa3af1bfb5ddc00a
+149	269	1698331183720853985	neural_network_implementation	d16b1a266fcba6f3
+13	1013	1700760244372344071	CMakeFiles/neural_network_implementation.dir/main.c.o	ba6890252a0d281f
+1013	1557	1700760244929913532	neural_network_implementation	d16b1a266fcba6f3

@@ -1,0 +1,91 @@
+Index: tests/orGate.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>//\n// Created by Ali Barış Gültekin on 26.10.2023.\n//\n
+===================================================================
+diff --git a/tests/orGate.c b/tests/orGate.c
+--- a/tests/orGate.c	
++++ b/tests/orGate.c	
+@@ -1,3 +1,78 @@
+-//
+-// Created by Ali Barış Gültekin on 26.10.2023.
+-//
++#include <stdlib.h>
++#include <stdio.h>
++#include <math.h>
++#include <time.h>
++#include "../mainProject/helpers.h"
++
++double train[][3] = {
++        {0, 0, 0},
++        {1, 0, 1},
++        {0, 1, 1},
++        {1, 1, 1},
++};
++
++#define train_count (sizeof(train)/sizeof(train[0]))
++
++double rand_double(void)
++{
++    return (double)rand() / (double)RAND_MAX;
++}
++
++
++double cost_two_inputs(double w1, double w2, double bias){
++
++    double result = 0.0;
++
++    for(size_t i = 0; i < train_count; ++i){
++        double x1 = train[i][0];
++        double x2 = train[i][1];
++        double y = (x1*w1 + x2*w2 + bias); // single artificial neuron mathematical model (with two inputs and a bias)
++        double d = y - train[i][2];
++        result += d*d;
++
++        //printf("actual : %f, expected: %f\n", y, train[i][1]);
++    }
++
++    result /= train_count;
++
++    return result;
++}
++
++int orGate(){
++    // menu();
++    srand((unsigned int)time(0));
++
++    // mathematical model:
++    // y = x * w + bias ; --> output = input * weight + bias
++
++
++    double w1 = rand_double()*10 - 5; // random number from 0 to 10
++    double w2 = rand_double()*10 - 5;
++    double b  = rand_double()*10 - 5;  // random number from 0 to 5
++
++    double eps = 1e-3;
++    double rate = 1e-3;
++
++    size_t epoch = 1000;
++
++    for(size_t i = 0; i < epoch; ++i){
++
++        double c = cost_two_inputs(w1, w2, b);
++
++        // finite difference: approximation of derivative
++        double dw1 = ((cost_two_inputs(w1 + eps, w2, b) - c)/eps);
++        double dw2 = ((cost_two_inputs(w1, w2 + eps, b) - c)/eps);
++        double db  = ((cost_two_inputs(w1, w2, b + eps) - c)/eps);
++
++        w1 -= rate*dw1;
++        w2 -= rate*dw2;
++        b  -= rate*db;
++
++        printf("cost = %f, w1 = %f, w2 = %f, bias = %f\n", cost_two_inputs(w1, w2, b), w1, w2, b);
++
++    }
++
++    printf("cost = %f, w1 = %f, w2 = %f, bias = %f\n", cost_two_inputs(w1, w2, b), w1, w2, b);
++
++    test_model(w1, w2, b);
++}
+\ No newline at end of file
