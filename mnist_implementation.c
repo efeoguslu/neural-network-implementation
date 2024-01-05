@@ -64,6 +64,8 @@ int main(int argc, char **argv){
     MAT_PRINT(ti);
     MAT_PRINT(to);
 
+    return 0;
+
     size_t arch[] = {2, 16, 16, 1};
     Network nn = nn_alloc(arch, ARRAY_LEN(arch));
     Network g = nn_alloc(arch, ARRAY_LEN(arch));
