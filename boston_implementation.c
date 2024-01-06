@@ -1,4 +1,5 @@
 #include "matrix.h"
+#include "activation.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,6 +33,8 @@ void normalizeFeatures(double *data, int num_records, int num_features);
 
 void getUserInput(double *userInput);
 void normalizeUserInput(double *userInput, double *mins, double *maxes);
+void findMinMax(double *data, int num_records, double *mins, double *maxes);
+double revertNormalizedValue(double normalizedValue, double min, double max);
 
 void trainNetwork(Network *nn, double *filteredData, int num_records, int epochs, double learning_rate, size_t *arch, size_t arch_len);
 double predict(Network *nn, double *inputFeatures);
@@ -40,48 +43,80 @@ void nn_free(Network *nn);
 
 int main()
 {
-    // DATA OPERATIONS
     int num_records;
     double *data = read_csv("housing.csv", &num_records);
     double *filteredData = malloc(num_records * TOTAL_COLUMNS_FILTERED * sizeof(double));
 
     filterDataToMatrix(data, num_records, filteredData);
-    normalizeFeatures(filteredData, num_records, NUM_FEATURES_FILTERED);
-    printFilteredData(filteredData, num_records);
+    normalizeFeatures(filteredData, num_records, NUM_FEATURES);
 
-    // NETWORK
-    size_t arch[] = {6, 8, 8, 1};
-    Network nn = nn_alloc(arch, sizeof(arch) / sizeof(arch[0]));
-    nn_rand(nn, -1.0, 1.0);
+    Mat t = mat_alloc(NUM_RECORDS, TOTAL_COLUMNS_FILTERED);
 
-    int epochs = 1000;
-    double learning_rate = 0.01;
-
-    trainNetwork(&nn, filteredData, num_records, epochs, learning_rate, arch, sizeof(arch) / sizeof(arch[0]));
-
-    // PREDICTION
-    double mins[NUM_FEATURES_FILTERED];
-    double maxes[NUM_FEATURES_FILTERED];
-    for (int j = 0; j < NUM_FEATURES_FILTERED; j++) {
-        mins[j] = DBL_MAX;
-        maxes[j] = -DBL_MAX;
-        for (int i = 0; i < num_records; i++) {
-            double value = filteredData[i * TOTAL_COLUMNS_FILTERED + j];
-            if (value < mins[j]) mins[j] = value;
-            if (value > maxes[j]) maxes[j] = value;
+    for (int i = 0; i < num_records; ++i)
+    {
+        for (int j = 0; j < TOTAL_COLUMNS_FILTERED; ++j)
+        {
+            size_t pos = i * TOTAL_COLUMNS_FILTERED + j;
+            MAT_AT(t, i, j) = filteredData[pos];
         }
     }
 
-    double userInput[NUM_FEATURES_FILTERED];
+    MAT_PRINT(t);
+    
+    Mat ti = {
+        .rows = t.rows,
+        .cols = 6,
+        .stride = t.stride,
+        .es = &MAT_AT(t, 0, 0),
+    };
 
+    Mat to = {
+        .rows = t.rows,
+        .cols = 1,
+        .stride = t.stride,
+        .es = &MAT_AT(t, 0, ti.cols),
+    };
+
+    MAT_PRINT(ti);
+    MAT_PRINT(to);
+
+    size_t arch[] = {6, 8, 5, 1}; // 6 16 16 1 cok iyiydi
+
+    Network nn = nn_alloc(arch, ARRAY_LEN(arch));
+    Network g  = nn_alloc(arch, ARRAY_LEN(arch));
+
+    nn_rand(nn, 0, 1);
+    double rate = 3.8;
+    size_t epoch = 50000;
+
+    printf("learning...\n");
+    for(size_t i = 0; i < epoch; ++i){
+        nn_backprop(nn, g, ti, to);
+        nn_learn(nn, g, rate);
+
+        printf("epoch: %zu\t cost: %lf\t learning rate: %.1lf\t\n", i, nn_cost(nn, ti, to), rate);
+    }
+
+    double userInput[NUM_FEATURES_FILTERED];
     getUserInput(userInput);
-    normalizeUserInput(userInput, mins, maxes); 
+
+    double mins[NUM_FEATURES_FILTERED];
+    double maxes[NUM_FEATURES_FILTERED];
+    double minPrice = 5.0;
+    double maxPrice = 50.0;
+
+    findMinMax(filteredData, num_records, mins, maxes);
+    normalizeUserInput(userInput, mins, maxes);
 
     double predictedPrice = predict(&nn, userInput);
-    printf("Predicted Price: %f\n", predictedPrice);
+    double originalPredictedPrice = revertNormalizedValue(predictedPrice, minPrice, maxPrice);
+    printf("1970 Predicted Price: $%.2f\n", originalPredictedPrice*1000);
+    printf("2023 Predicted Price: $%.2f\n", originalPredictedPrice*1000*8.12);
 
+    nn_free(&nn);
     free(filteredData);
     free(data);
+
     return 0;
 }
 
@@ -227,79 +262,65 @@ void printUserInput(double *userInput)
     printf("\nTarget: %f\n", 0.0); // Target is set to 0
 }
 
-void normalizeFeatures(double *data, int num_records, int num_features) {
-    for (int j = 0; j < num_features; j++) {
+void normalizeFeatures(double *data, int num_records, int num_features)
+{
+    for (int j = 0; j < num_features; j++)
+    {
         double min = DBL_MAX;
         double max = -DBL_MAX;
 
         // Finding min and max for each feature
-        for (int i = 0; i < num_records; i++) {
+        for (int i = 0; i < num_records; i++)
+        {
             double value = data[i * TOTAL_COLUMNS_FILTERED + j];
-            if (value < min) min = value;
-            if (value > max) max = value;
+            if (value < min)
+                min = value;
+            if (value > max)
+                max = value;
         }
 
         // Normalizing each feature
-        for (int i = 0; i < num_records; i++) {
-            double value = data[i * TOTAL_COLUMNS_FILTERED + j];
-            // Rescale to -1 to 1
-            data[i * TOTAL_COLUMNS_FILTERED + j] = 2 * (value - min) / (max - min) - 1;
-        }
-    }
-}
-
-
-void normalizeUserInput(double *userInput, double *mins, double *maxes) {
-    for (int i = 0; i < NUM_FEATURES_FILTERED; i++) {
-        userInput[i] = 2 * (userInput[i] - mins[i]) / (maxes[i] - mins[i]) - 1;
-    }
-}
-
-void trainNetwork(Network *nn, double *filteredData, int num_records, int epochs, double learning_rate, size_t *arch, size_t arch_len)
-{
-    Network gradient = nn_alloc(arch, arch_len);
-
-    // Creating matrices for a single training example
-    Mat ti = mat_alloc(1, NUM_FEATURES_FILTERED); // One row, NUM_FEATURES_FILTERED columns for input
-    Mat to = mat_alloc(1, 1);                     // One row, one column for target
-
-    for (int epoch = 0; epoch < epochs; epoch++)
-    {
-        double total_cost = 0.0;
-
         for (int i = 0; i < num_records; i++)
         {
-            // Setting up input features (ti) for this record
-            for (int j = 0; j < NUM_FEATURES_FILTERED; j++)
-            {
-                MAT_AT(ti, 0, j) = filteredData[i * TOTAL_COLUMNS_FILTERED + j];
-            }
-
-            // Setting up target value (to) for this record
-            MAT_AT(to, 0, 0) = filteredData[i * TOTAL_COLUMNS_FILTERED + NUM_FEATURES_FILTERED];
-
-            // Forward pass
-            mat_copy(NN_INPUT(*nn), ti); // Copy ti matrix to network's input
-            nn_forward(*nn);
-
-            // Compute cost (mean squared error)
-            double predicted = MAT_AT(NN_OUTPUT(*nn), 0, 0);
-            double cost = (predicted - MAT_AT(to, 0, 0)) * (predicted - MAT_AT(to, 0, 0));
-            total_cost += cost;
-
-            // Backward pass and update weights
-            nn_backprop(*nn, gradient, ti, to);
-            nn_learn(*nn, gradient, learning_rate);
+            double value = data[i * TOTAL_COLUMNS_FILTERED + j];
+            // Rescale to 0 to 1
+            data[i * TOTAL_COLUMNS_FILTERED + j] = (value - min) / (max - min);
         }
+    }
+}
 
-        total_cost /= num_records;
-        printf("Epoch %d, Cost: %f\n", epoch, total_cost);
+
+void normalizeUserInput(double *userInput, double *mins, double *maxes)
+{
+    for (int i = 0; i < NUM_FEATURES_FILTERED; i++)
+    {
+        userInput[i] = (userInput[i] - mins[i]) / (maxes[i] - mins[i]);
+    }
+}
+
+void findMinMax(double *data, int num_records, double *mins, double *maxes) {
+    // Initialize mins and maxes
+    for (int i = 0; i < NUM_FEATURES_FILTERED; i++) {
+        mins[i] = DBL_MAX;
+        maxes[i] = -DBL_MAX;
     }
 
-    // Free the gradient network and matrices after training
-    nn_free(&gradient);
-    mat_free(ti);
-    mat_free(to);
+    // Iterate through the dataset
+    for (int i = 0; i < num_records; i++) {
+        for (int j = 0; j < NUM_FEATURES_FILTERED; j++) {
+            double value = data[i * TOTAL_COLUMNS_FILTERED + j];
+            if (value < mins[j]) {
+                mins[j] = value;
+            }
+            if (value > maxes[j]) {
+                maxes[j] = value;
+            }
+        }
+    }
+}
+
+double revertNormalizedValue(double normalizedValue, double min, double max) {
+    return normalizedValue * (max - min) + min;
 }
 
 double predict(Network *nn, double *inputFeatures)

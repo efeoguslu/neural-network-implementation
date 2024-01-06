@@ -301,7 +301,7 @@ void mat_rand(Mat m, double low, double high){
 void mat_sig(Mat m){
     for(size_t i = 0; i < m.rows; ++i){
         for(size_t j = 0; j < m.cols; ++j){
-            MAT_AT(m, i, j) = g_activation_func(MAT_AT(m, i, j));
+            MAT_AT(m, i, j) = sigmoid(MAT_AT(m, i, j));
         }
     }
 }
