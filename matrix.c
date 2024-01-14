@@ -8,14 +8,10 @@
 // Network nn = nn_alloc(arch, ARRAY_LEN(layers));
 
 Network nn_alloc(size_t *arch, size_t arch_count){
-
     MATRIX_ASSERT(arch_count > 0);
-
     Network nn;
     nn.count = arch_count - 1; // subtracting the input layer
-
     // preallocating arrays of matrices
-
     nn.ws = MATRIX_MALLOC(sizeof(*nn.ws)*nn.count);
     MATRIX_ASSERT(nn.ws != NULL);
     nn.bs = MATRIX_MALLOC(sizeof(*nn.bs)*nn.count);
@@ -70,23 +66,18 @@ double nn_cost(Network nn, Mat ti, Mat to){
     assert(to.cols == NN_OUTPUT(nn).cols);
 
     size_t n = ti.rows;
-
     double c = 0;
-
     for(size_t i = 0; i < n; ++i){
         Mat x = mat_row(ti, i); // expected input
         Mat y = mat_row(to, i); // expected output
-
         mat_copy(NN_INPUT(nn), x);
         nn_forward(nn);
         size_t q = to.cols;
-
         for(size_t j = 0; j < q; ++j){
             double d = MAT_AT(NN_OUTPUT(nn), 0, j) - MAT_AT(y, 0, j);
             c += d*d;
         }
     }
-
     return c/n;
 }
 
@@ -120,22 +111,18 @@ void nn_finite_diff(Network nn, Network g, double eps, Mat ti, Mat to){
 }
 
 void nn_learn(Network nn, Network g, double rate){
-
     for(size_t i = 0; i < nn.count; ++i){
-
         for(size_t j = 0; j < nn.ws[i].rows; ++j){
             for(size_t k = 0; k < nn.ws[i].cols; ++k){
                 MAT_AT(nn.ws[i], j, k) -= rate*MAT_AT(g.ws[i], j, k);
             }
         }
-
         for(size_t j = 0; j < nn.bs[i].rows; ++j){
             for(size_t k = 0; k < nn.bs[i].cols; ++k){
                 MAT_AT(nn.bs[i], j, k) -= rate*MAT_AT(g.bs[i], j, k);
 
             }
         }
-
     }
 }
 
@@ -319,4 +306,17 @@ void mat_save(FILE *file, Mat m) {
 
 void mat_free(Mat m) {
     free(m.es);
+}
+
+void mat_shuffle_rows(Mat m){
+    for(size_t i = 0; i < m.rows; ++i){
+        size_t j = i + rand()%(m.rows - i);
+        if(i != j){
+            for(size_t k = 0; k < m.cols; ++k){
+                double t = MAT_AT(m, i, k);
+                MAT_AT(m, i, k) = MAT_AT(m, j, k);
+                MAT_AT(m, j, k) = t;
+            }
+        }
+    }
 }

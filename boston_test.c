@@ -1,4 +1,176 @@
-#include "csv.h"
+#include "matrix.h"
+#include "activation.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <float.h>
+
+// BOSTON DATA MACROS
+#define NUM_RECORDS 506
+
+#define NUM_FEATURES 13
+#define TOTAL_COLUMNS (NUM_FEATURES + 1) // 13 features + 1 target
+
+#define NUM_FEATURES_FILTERED 6
+#define TOTAL_COLUMNS_FILTERED (NUM_FEATURES_FILTERED + 1)
+
+// FEATURE AVERAGE VALUES (PLACEHOLDERS)
+#define AVG_RM 6.24
+#define AVG_LSTAT 12.65
+#define AVG_PTRATIO 18.45
+#define AVG_CRIM 3.61
+#define AVG_NOX 0.55
+#define AVG_DIS 3.79
+
+double *read_csv(const char *filename, int *num_records);
+void printData(double *data, int num_records);
+void printFilteredData(double *matrix, int num_records);
+void printUserInput(double *userInput);
+
+void filterDataToMatrix(double *data, int num_records, double *matrix);
+void normalizeFeatures(double *data, int num_records, int num_features, double *minPrice, double *maxPrice);
+void getUserInput(double *userInput);
+void normalizeUserInput(double *userInput, double *mins, double *maxes);
+void findMinMax(double *data, int num_records, double *mins, double *maxes);
+double revertNormalizedValue(double normalizedValue, double min, double max);
+
+void trainNetwork(Network *nn, double *filteredData, int num_records, int epochs, double learning_rate, size_t *arch, size_t arch_len);
+double predict(Network *nn, double *inputFeatures);
+
+void nn_free(Network *nn);
+
+int main()
+{
+    int num_records;
+    double *data = read_csv("housing.csv", &num_records);
+    double *filteredData = malloc(num_records * TOTAL_COLUMNS_FILTERED * sizeof(double));
+
+    filterDataToMatrix(data, num_records, filteredData);
+    //normalizeFeatures(filteredData, num_records_train, NUM_FEATURES_FILTERED, &minPrice, &maxPrice);
+
+    
+
+    // Calculate the number of records for training and testing
+    int num_records_train = (int)(0.8 * num_records);
+    int num_records_test = num_records - num_records_train;
+
+    // Allocate memory for training and testing data
+    double *data_train = malloc(num_records_train * TOTAL_COLUMNS_FILTERED * sizeof(double));
+    double *data_test = malloc(num_records_test * TOTAL_COLUMNS_FILTERED * sizeof(double));
+
+    // Copy normalized data to training and testing arrays
+    memcpy(data_train, filteredData, num_records_train * TOTAL_COLUMNS_FILTERED * sizeof(double));
+    memcpy(data_test, filteredData + num_records_train * TOTAL_COLUMNS_FILTERED, num_records_test * TOTAL_COLUMNS_FILTERED * sizeof(double));
+
+    double minPrice, maxPrice;
+
+    // Calculate min and max values during normalization
+    // normalizeFeatures(filteredData, num_records_train, NUM_FEATURES_FILTERED, &minPrice, &maxPrice);
+    normalizeFeatures(filteredData, num_records_train, NUM_FEATURES_FILTERED, &minPrice, &maxPrice);
+
+
+    Mat t_train = mat_alloc(num_records_train, TOTAL_COLUMNS_FILTERED);
+
+    // Copy training data to a matrix
+    for (int i = 0; i < num_records_train; ++i)
+    {
+        for (int j = 0; j < TOTAL_COLUMNS_FILTERED; ++j)
+        {
+            size_t pos = i * TOTAL_COLUMNS_FILTERED + j;
+            MAT_AT(t_train, i, j) = data_train[pos];
+        }
+    }
+
+    MAT_PRINT(t_train);
+
+    Mat ti_train = {
+        .rows = t_train.rows,
+        .cols = 6,
+        .stride = t_train.stride,
+        .es = &MAT_AT(t_train, 0, 0),
+    };
+
+    Mat to_train = {
+        .rows = t_train.rows,
+        .cols = 1,
+        .stride = t_train.stride,
+        .es = &MAT_AT(t_train, 0, ti_train.cols),
+    };
+
+    size_t arch[] = {6, 8, 5, 1}; // 6 8 5 1 (example architecture)
+
+    Network nn = nn_alloc(arch, ARRAY_LEN(arch));
+    Network g = nn_alloc(arch, ARRAY_LEN(arch));
+
+    nn_rand(nn, 0, 1);
+    double rate = 3.8;
+    size_t epoch = 50000;
+
+    printf("Training...\n");
+    for (size_t i = 0; i < epoch; ++i)
+    {
+        nn_backprop(nn, g, ti_train, to_train);
+        nn_learn(nn, g, rate);
+
+        printf("Epoch: %zu\t Cost: %lf\t Learning Rate: %.3lf\n", i, nn_cost(nn, ti_train, to_train), rate);
+    }
+
+    // Now test the network using data_test
+
+    Mat t_test = mat_alloc(num_records_test, TOTAL_COLUMNS_FILTERED);
+
+    // Copy testing data to a matrix
+    for (int i = 0; i < num_records_test; ++i)
+    {
+        for (int j = 0; j < TOTAL_COLUMNS_FILTERED; ++j)
+        {
+            size_t pos = i * TOTAL_COLUMNS_FILTERED + j;
+            MAT_AT(t_test, i, j) = data_test[pos];
+        }
+    }
+
+    MAT_PRINT(t_test);
+
+    Mat ti_test = {
+        .rows = t_test.rows,
+        .cols = 6,
+        .stride = t_test.stride,
+        .es = &MAT_AT(t_test, 0, 0),
+    };
+
+    // Perform forward pass on the testing data
+    nn_forward(nn);
+
+    // Display the predicted prices
+    for (int i = 0; i < num_records_test; ++i)
+    {
+        double predictedPrice = MAT_AT(NN_OUTPUT(nn), i, 0);
+        double originalPredictedPrice = revertNormalizedValue(predictedPrice, minPrice, maxPrice);
+        printf("Test Record %d: Predicted Price: $%.2f\n", i + 1, originalPredictedPrice * 1000 * 8.12);
+    }
+
+    // Free allocated memory
+    nn_free(&nn);
+    free(filteredData);
+    free(data_train);
+    free(data_test);
+    free(data);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // FUNCTIONS
@@ -143,7 +315,7 @@ void printUserInput(double *userInput)
     printf("\nTarget: %f\n", 0.0); // Target is set to 0
 }
 
-void normalizeFeatures(double *data, int num_records, int num_features)
+void normalizeFeatures(double *data, int num_records, int num_features, double *minPrice, double *maxPrice)
 {
     for (int j = 0; j < num_features; j++)
     {
@@ -158,6 +330,13 @@ void normalizeFeatures(double *data, int num_records, int num_features)
                 min = value;
             if (value > max)
                 max = value;
+        }
+
+        // If it's the target variable (price), set minPrice and maxPrice
+        if (j == num_features - 1)
+        {
+            *minPrice = min;
+            *maxPrice = max;
         }
 
         // Normalizing each feature

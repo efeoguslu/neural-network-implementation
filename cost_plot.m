@@ -9,3 +9,8 @@ ylabel('Cost');
 grid on;
 
 saveas(gcf, 'cost_plot.png');
+
+
+
+
+

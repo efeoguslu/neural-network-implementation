@@ -52,6 +52,8 @@ void mat_copy(Mat dst, Mat src);
 void mat_fill(Mat m, double x);
 void mat_save(FILE *file, Mat m);
 void mat_free(Mat m);
+
+void mat_shuffle_rows(Mat m);
 // ---------------------------------------------------------------------------------
 
 Network nn_alloc(size_t *arch, size_t arch_count);

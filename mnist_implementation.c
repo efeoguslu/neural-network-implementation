@@ -47,9 +47,11 @@ int main(int argc, char **argv){
         }
     }
 
+    // mat_shuffle_rows(t);
+
+    
     Mat ti = {
-        .rows = t.rows,
-        .cols = 2,
+        .rows = t.rows, .cols = 2,
         .stride = t.stride,
         .es = &MAT_AT(t, 0, 0),
     };
@@ -63,19 +65,21 @@ int main(int argc, char **argv){
 
     MAT_PRINT(ti);
     MAT_PRINT(to);
-
-    return 0;
+    
 
     size_t arch[] = {2, 16, 16, 1};
     Network nn = nn_alloc(arch, ARRAY_LEN(arch));
     Network g = nn_alloc(arch, ARRAY_LEN(arch));
     nn_rand(nn, -1, 1);
 
-    double rate = 2.5;
-    size_t epoch = 25000;
+    double rate = 1.0;
+    size_t epoch = 50000;
+    //size_t batch_size = 28 ;
+    //size_t batch_count = (t.rows + batch_size - 1)/batch_size;
 
     clock_t start, end;
     start = clock();
+
 
     FILE *cost_file = fopen(output_cost_file_name, "w"); 
 
@@ -85,12 +89,33 @@ int main(int argc, char **argv){
     }
 
     for(size_t i = 0; i < epoch; ++i){
+        /*
+        size_t batch_current = i % batch_count;
+
+        Mat batch_ti = {
+            .rows = batch_size, 
+            .cols = 2,
+            .stride = t.stride,
+            .es = &MAT_AT(t, batch_current*batch_size, 0),
+        };
+        
+
+        Mat batch_to = {
+            .rows = batch_size,
+            .cols = 1,
+            .stride = t.stride,
+            .es = &MAT_AT(t, batch_current*batch_size, batch_ti.cols),
+        };
+        */
+
+        // nn_backprop(nn, g, batch_ti, batch_to);
 
         nn_backprop(nn, g, ti, to);
         nn_learn(nn, g, rate);
 
-        //fprintf(cost_file, "%lf\n", nn_cost(nn, ti, to));
+        // fprintf(cost_file, "%lf\n", nn_cost(nn, ti, to));
 
+        /*
         
         if(i % 100 == 0){
             dline();
@@ -111,6 +136,7 @@ int main(int argc, char **argv){
             }
 
         }
+        */
         
     }
 
@@ -181,6 +207,7 @@ int main(int argc, char **argv){
     printf("Generated %s from trained matrix\n", output_image_path);
 
     double dblTime = ((double)(end - start)) / CLOCKS_PER_SEC;
+
     dline();
     printf("\n%lf seconds have elapsed during the training process.\n", dblTime);
 
