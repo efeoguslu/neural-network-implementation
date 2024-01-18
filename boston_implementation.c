@@ -11,9 +11,9 @@ int main()
     filterDataToMatrix(data, num_records, filteredData);
     normalizeFeatures(filteredData, num_records, NUM_FEATURES);
 
-    Mat t = mat_alloc(NUM_RECORDS, TOTAL_COLUMNS_FILTERED);
+    Mat t = mat_alloc(NUM_RECORDS_TRAIN, TOTAL_COLUMNS_FILTERED);
 
-    for (int i = 0; i < num_records; ++i)
+    for (int i = 0; i < num_records; ++i)clea
     {
         for (int j = 0; j < TOTAL_COLUMNS_FILTERED; ++j)
         {

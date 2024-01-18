@@ -204,21 +204,19 @@ double revertNormalizedValue(double normalizedValue, double min, double max) {
     return normalizedValue * (max - min) + min;
 }
 
-double predict(Network *nn, double *inputFeatures)
+double predict(Network *nn, double *input)
 {
-    // Set the input features to the input layer of the network
-    for (int j = 0; j < NUM_FEATURES_FILTERED; j++)
+    // Normalize input features using the same mins and maxes values used during training
+    for (int i = 0; i < NUM_FEATURES_FILTERED - 1; ++i)
     {
-        MAT_AT(NN_INPUT(*nn), 0, j) = inputFeatures[j];
+        input[i] = normalizeValue(input[i], mins[i], maxes[i]);
     }
 
-    // Perform forward pass
-    nn_forward(*nn);
+    // Perform feedforward
+    nn_feedforward(nn, input);
 
-    // Assuming the output is a single value, extract it from the output layer
-    double predictedPrice = MAT_AT(NN_OUTPUT(*nn), 0, 0);
-
-    return predictedPrice;
+    // Output of the network (assuming one output neuron)
+    return nn_get_output(nn, 0);
 }
 
 void nn_free(Network *nn)

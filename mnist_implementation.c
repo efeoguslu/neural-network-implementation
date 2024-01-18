@@ -46,9 +46,6 @@ int main(int argc, char **argv){
             MAT_AT(t, i, 2) = img_pixels[i]/255.0;
         }
     }
-
-    // mat_shuffle_rows(t);
-
     
     Mat ti = {
         .rows = t.rows, .cols = 2,
@@ -74,8 +71,6 @@ int main(int argc, char **argv){
 
     double rate = 1.0;
     size_t epoch = 50000;
-    //size_t batch_size = 28 ;
-    //size_t batch_count = (t.rows + batch_size - 1)/batch_size;
 
     clock_t start, end;
     start = clock();
@@ -89,24 +84,6 @@ int main(int argc, char **argv){
     }
 
     for(size_t i = 0; i < epoch; ++i){
-        /*
-        size_t batch_current = i % batch_count;
-
-        Mat batch_ti = {
-            .rows = batch_size, 
-            .cols = 2,
-            .stride = t.stride,
-            .es = &MAT_AT(t, batch_current*batch_size, 0),
-        };
-        
-
-        Mat batch_to = {
-            .rows = batch_size,
-            .cols = 1,
-            .stride = t.stride,
-            .es = &MAT_AT(t, batch_current*batch_size, batch_ti.cols),
-        };
-        */
 
         // nn_backprop(nn, g, batch_ti, batch_to);
 
@@ -115,7 +92,7 @@ int main(int argc, char **argv){
 
         // fprintf(cost_file, "%lf\n", nn_cost(nn, ti, to));
 
-        /*
+        
         
         if(i % 100 == 0){
             dline();
@@ -136,7 +113,7 @@ int main(int argc, char **argv){
             }
 
         }
-        */
+        
         
     }
 

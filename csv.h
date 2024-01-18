@@ -8,7 +8,8 @@
 #include <float.h>
 
 // BOSTON DATA MACROS
-#define NUM_RECORDS 506
+#define NUM_RECORDS_TRAIN 406
+#define NUM_RECORDS_TEST 100
 
 #define NUM_FEATURES 13
 #define TOTAL_COLUMNS (NUM_FEATURES + 1) // 13 features + 1 target
