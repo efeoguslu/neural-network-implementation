@@ -320,3 +320,83 @@ void mat_shuffle_rows(Mat m){
         }
     }
 }
+
+
+// --------------------------------------------------------------------------------
+
+
+/*
+
+Forward propagation: The network processes the input data to produce an output.
+Loss computation: The difference between the network's output and the target output is calculated.
+Backward propagation: The error is propagated backward through the network, computing gradients for each layer's weights and biases.
+Gradient averaging: The gradients are averaged over all samples to adjust the network parameters in the training process.
+This code assumes a specific activation function (possibly sigmoid, given the a * (1 - a) term in the gradient calculations) and loss function (possibly mean squared error, given the 2 * da term). Ensure these assumptions are correct for your network before using the code.
+*/
+
+
+
+void nn_backpropagation(Network nn, Network g, Mat ti, Mat to){
+    // Ensure the input and target output matrices have the same number of rows
+    MATRIX_ASSERT(ti.rows == to.rows);
+    size_t n = ti.rows; // Number of training samples
+    // Ensure the network's output layer and the target output matrix have the same number of columns
+    MATRIX_ASSERT(NN_OUTPUT(nn).cols == to.cols);
+
+    nn_zero(g); // Initialize gradient network to zero
+
+    // Loop over each training sample
+    for(size_t i = 0; i < n; ++i){
+        // Set the current input sample to the network's input layer
+        mat_copy(NN_INPUT(nn), mat_row(ti, i));
+        // Perform a forward pass to compute the network's output
+        nn_forward(nn);
+
+        // Initialize gradients for each layer to zero
+        for(size_t j = 0; j <= nn.count; ++j){
+            mat_fill(g.as[j], 0);
+        }
+
+        // Calculate the output layer's error (gradient of the loss w.r.t. the output)
+        for(size_t j = 0; j < to.cols; ++j){
+            MAT_AT(NN_OUTPUT(g), 0, j) = MAT_AT(NN_OUTPUT(nn), 0, j) - MAT_AT(to, i, j);
+        }
+
+        // Propagate the error backwards through the network
+        for(size_t layer = nn.count; layer > 0; --layer){
+            for(size_t j = 0; j < nn.as[layer].cols; ++j){
+                double a = MAT_AT(nn.as[layer], 0, j); // Activation of current neuron
+                double da = MAT_AT(g.as[layer], 0, j); // Gradient of the loss w.r.t. current neuron's activation
+                // Compute gradient for biases and update
+                MAT_AT(g.bs[layer - 1], 0, j) += 2*da*a*(1 - a); // Assuming sigmoid activation function for simplicity
+
+                // Loop over all connections coming into current neuron
+                for(size_t k = 0; k < nn.as[layer - 1].cols; ++k){
+                    double pa = MAT_AT(nn.as[layer - 1], 0, k); // Activation of previous neuron
+                    double w  = MAT_AT(nn.ws[layer - 1], k, j); // Weight of connection from previous neuron
+                    // Compute gradient for weights and update
+                    MAT_AT(g.ws[layer - 1], k, j) += 2*da*a*(1 - a)*pa; // Gradient for weight
+                    // Accumulate gradient for activations of neurons in the previous layer (for backpropagation)
+                    MAT_AT(g.as[layer - 1], 0, k) += 2*da*a*(1 - a)*w;
+                }
+            }
+        }
+    }
+
+    // Average the gradients over all samples
+    for(size_t i = 0; i < g.count; ++i){
+        // Average gradients for weights
+        for(size_t j = 0; j < g.ws[i].rows; ++j){
+            for(size_t k = 0; k < g.ws[i].cols; ++k){
+                MAT_AT(g.ws[i], j, k) /= n;
+            }
+        }
+
+        // Average gradients for biases
+        for(size_t j = 0; j < g.bs[i].rows; ++j){
+            for(size_t k = 0; k < g.bs[i].cols; ++k){
+                MAT_AT(g.bs[i], j, k) /= n;
+            }
+        }
+    }
+}
